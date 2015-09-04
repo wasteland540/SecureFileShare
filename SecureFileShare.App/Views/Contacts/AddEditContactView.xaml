@@ -1,0 +1,15 @@
+﻿<Window x:Class="SecureFileShare.App.Views.Contacts.AddEditContactView"
+        x:Name="View"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Title="{Binding Title}" Height="165" Width="622">
+    <Grid>
+        <Label Content="Contact data:" HorizontalAlignment="Left" Margin="10,10,0,0" VerticalAlignment="Top"/>
+        <Label Content="Name:" HorizontalAlignment="Left" Margin="10,41,0,0" VerticalAlignment="Top"/>
+        <TextBox Text="{Binding Name}" HorizontalAlignment="Left" Height="23" Margin="68,44,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="456"/>
+        <Label Content="Key File:" HorizontalAlignment="Left" Margin="10,72,0,0" VerticalAlignment="Top"/>
+        <TextBox Text="{Binding KeyFilePath}" IsEnabled="False" HorizontalAlignment="Left" Height="23" Margin="68,72,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="456"/>
+        <Button Content="Choose..." Command="{Binding ChooseCommand}" HorizontalAlignment="Left" Margin="529,72,0,0" VerticalAlignment="Top" Width="75" Height="23"/>
+        <Button Content="Save" Command="{Binding SaveCommand}" CommandParameter="{Binding ElementName=View}" HorizontalAlignment="Left" Margin="529,100,0,0" VerticalAlignment="Top" Width="75" Height="23"/>
+    </Grid>
+</Window>

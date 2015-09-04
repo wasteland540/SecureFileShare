@@ -1,0 +1,52 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio 2013
+VisualStudioVersion = 12.0.31101.0
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SecureFileShare.App", "SecureFileShare.App\SecureFileShare.App.csproj", "{08379261-D2F7-4EA6-B94F-34F5D5586A0F}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SecureFileShare.Model", "SecureFileShare.Model\SecureFileShare.Model.csproj", "{3246DB3E-9852-471B-99A6-5F536B624F04}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SecureFileShare.DataAccessLayer", "SecureFileShare.DataAccessLayer\SecureFileShare.DataAccessLayer.csproj", "{99270F76-7E90-40AB-AEB8-B1C5C2BF492D}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SecureFileShareUnitTests", "SecureFileShareUnitTests\SecureFileShareUnitTests.csproj", "{E0AABAA3-8AF1-488A-80D2-50654E4C7620}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SecureFileShare.Security", "SecureFileShare.Security\SecureFileShare.Security.csproj", "{6DE8CE7D-967B-408C-BA48-BBA9296D99CA}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SecureFileShare.Util", "SecureFileShare.Util\SecureFileShare.Util.csproj", "{8EB4BAB9-4035-4183-8C51-27B3CA6E69A4}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{08379261-D2F7-4EA6-B94F-34F5D5586A0F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{08379261-D2F7-4EA6-B94F-34F5D5586A0F}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{08379261-D2F7-4EA6-B94F-34F5D5586A0F}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{08379261-D2F7-4EA6-B94F-34F5D5586A0F}.Release|Any CPU.Build.0 = Release|Any CPU
+		{3246DB3E-9852-471B-99A6-5F536B624F04}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{3246DB3E-9852-471B-99A6-5F536B624F04}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{3246DB3E-9852-471B-99A6-5F536B624F04}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{3246DB3E-9852-471B-99A6-5F536B624F04}.Release|Any CPU.Build.0 = Release|Any CPU
+		{99270F76-7E90-40AB-AEB8-B1C5C2BF492D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{99270F76-7E90-40AB-AEB8-B1C5C2BF492D}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{99270F76-7E90-40AB-AEB8-B1C5C2BF492D}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{99270F76-7E90-40AB-AEB8-B1C5C2BF492D}.Release|Any CPU.Build.0 = Release|Any CPU
+		{E0AABAA3-8AF1-488A-80D2-50654E4C7620}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{E0AABAA3-8AF1-488A-80D2-50654E4C7620}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{E0AABAA3-8AF1-488A-80D2-50654E4C7620}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{E0AABAA3-8AF1-488A-80D2-50654E4C7620}.Release|Any CPU.Build.0 = Release|Any CPU
+		{6DE8CE7D-967B-408C-BA48-BBA9296D99CA}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{6DE8CE7D-967B-408C-BA48-BBA9296D99CA}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{6DE8CE7D-967B-408C-BA48-BBA9296D99CA}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{6DE8CE7D-967B-408C-BA48-BBA9296D99CA}.Release|Any CPU.Build.0 = Release|Any CPU
+		{8EB4BAB9-4035-4183-8C51-27B3CA6E69A4}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{8EB4BAB9-4035-4183-8C51-27B3CA6E69A4}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{8EB4BAB9-4035-4183-8C51-27B3CA6E69A4}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{8EB4BAB9-4035-4183-8C51-27B3CA6E69A4}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+EndGlobal

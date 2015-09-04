@@ -1,0 +1,30 @@
+﻿<Window x:Class="SecureFileShare.App.Views.Contacts.ContactsView"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:behav="clr-namespace:SecureFileShare.App.Behaviors"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" mc:Ignorable="d"
+        Title="Secure File Share - Contacts" Height="254" Width="369" ResizeMode="NoResize">
+    <Grid>
+        <Label Content="Contacts:" HorizontalAlignment="Left" Margin="10,3,0,0" VerticalAlignment="Top"/>
+        <Rectangle Fill="#FFF4F4F5" HorizontalAlignment="Left" Height="175" Margin="10,29,0,0" Stroke="Black" VerticalAlignment="Top" Width="331"/>
+        <Label Content="Search:" HorizontalAlignment="Left" Margin="15,31,0,0" VerticalAlignment="Top"/>
+        <TextBox Text="{Binding SearchQuery, UpdateSourceTrigger=PropertyChanged}" HorizontalAlignment="Left" Height="23" Margin="68,34,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="140"/>
+        <ListBox ItemsSource="{Binding Contacts}" SelectedItem="{Binding SelectedContact}" behav:DoubleClickSelectorItem.DoubleClickItemCommand="{Binding ContactDoubleClickCommand}"  HorizontalAlignment="Left" Height="128" Margin="24,62,0,0" VerticalAlignment="Top" Width="304">
+            <ListBox.ItemTemplate>
+                <DataTemplate>
+                    <TextBlock Text="{Binding Name}">
+                        <TextBlock.ContextMenu>
+                            <ContextMenu>
+                                <MenuItem Header="Delete" />
+                            </ContextMenu>
+                        </TextBlock.ContextMenu>
+                    </TextBlock>
+                </DataTemplate>
+            </ListBox.ItemTemplate>
+        </ListBox>
+        <Button Content="Edit" Command="{Binding EditCommand}" HorizontalAlignment="Left" Margin="262,37,0,0" VerticalAlignment="Top" Width="35"/>
+        <Button Content="Delete" Command="{Binding DeleteCommand}" HorizontalAlignment="Left" Margin="213,37,0,0" VerticalAlignment="Top" Width="44"/>
+        <Button Content="Add" Command="{Binding AddCommand}" HorizontalAlignment="Left" Margin="302,37,0,0" VerticalAlignment="Top" Width="26"/>
+    </Grid>
+</Window>
