@@ -87,7 +87,12 @@
     <Compile Include="Messages\AddEditContactViewClosedMsg.cs" />
     <Compile Include="Messages\AssignNewKeysConfirmMsg.cs" />
     <Compile Include="Messages\AssignNewKeysRequestMsg.cs" />
-    <Compile Include="Messages\AssignNewKeysSuccsess.cs" />
+    <Compile Include="Messages\AssignNewKeysSuccsessMsg.cs" />
+    <Compile Include="Messages\ChooseSourceConfirmMsg.cs" />
+    <Compile Include="Messages\ChooseSourceRequestMsg.cs" />
+    <Compile Include="Messages\ChooseTargetConfirmMsg.cs" />
+    <Compile Include="Messages\ChooseTargetRequestMsg.cs" />
+    <Compile Include="Messages\ContactSelectedMsg.cs" />
     <Compile Include="Messages\ContactsViewClosedMsg.cs" />
     <Compile Include="Messages\DeleteContactConfirmMsg.cs" />
     <Compile Include="Messages\DeleteContactRequestMsg.cs" />

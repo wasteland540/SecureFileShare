@@ -1,4 +1,5 @@
 ﻿using System.Linq;
+using System.Security.Cryptography;
 using System.Windows;
 using System.Windows.Input;
 using GalaSoft.MvvmLight.Messaging;
@@ -7,6 +8,7 @@ using Microsoft.Practices.Unity;
 using SecureFileShare.App.Commands;
 using SecureFileShare.App.Messages;
 using SecureFileShare.App.Services;
+using SecureFileShare.App.ViewModels.Contacts;
 using SecureFileShare.App.Views.Contacts;
 using SecureFileShare.App.Views.MyAccount;
 using SecureFileShare.DataAccessLayer;
@@ -29,6 +31,19 @@ namespace SecureFileShare.App.ViewModels
         private ICommand _assignNewKeysCommand;
         private ICommand _exportPublicKeyCommand;
 
+        private string _sourceFilepath;
+        private string _targetFilepath;
+        private ICommand _chooseSourceCommand;
+        private ICommand _chooseTargetCommand;
+        private ICommand _chooseContactCommand;
+        private ICommand _encryptCommand;
+        private ICommand _decryptCommand;
+        private string _contactName;
+        public RSAParameters PublicKey { get; set; }
+
+
+        //TODO: properties for enable disable en/decrypt btn! (check fileending!)
+
         public MainViewModel(ICryptographyService cryptographyService, IMessenger messenger, IDataAccessLayer database)
         {
             _cryptographyService = cryptographyService;
@@ -39,8 +54,11 @@ namespace SecureFileShare.App.ViewModels
             _messenger.Register<AssignNewKeysConfirmMsg>(this, OnAssignNewKeysConfirmMsg);
             _messenger.Register<ExportPublicKeyConfirmMsg>(this, OnExportPublicKeyConfirmMsg);
             _messenger.Register<ContactsViewClosedMsg>(this, OnContactsViewClosedMsg);
+            _messenger.Register<ChooseSourceConfirmMsg>(this, OnChooseSourceConfirmMsg);
+            _messenger.Register<ChooseTargetConfirmMsg>(this, OnChooseTargetConfirmMsg);
+            _messenger.Register<ContactSelectedMsg>(this, OnContactSelectedMsg);
         }
-        
+
         #region Properties
 
         public ICommand ExitCommand
@@ -88,6 +106,90 @@ namespace SecureFileShare.App.ViewModels
             }
         }
 
+        public string SourceFilepath
+        {
+            get { return _sourceFilepath; }
+            set
+            {
+                if (value != null && value != _sourceFilepath)
+                {
+                    _sourceFilepath = value;
+                    RaisePropertyChanged("SourceFilepath");
+                }
+            }
+        }
+
+        public string TargetFilepath
+        {
+            get { return _targetFilepath; }
+            set
+            {
+                if (value != null && value != _targetFilepath)
+                {
+                    _targetFilepath = value;
+                    RaisePropertyChanged("TargetFilepath");
+                }
+            }
+        }
+
+        public ICommand ChooseSourceCommand
+        {
+            get
+            {
+                _chooseSourceCommand = _chooseSourceCommand ?? new DelegateCommand(ChooseSource);
+                return _chooseSourceCommand;
+            }
+        }
+
+        public ICommand ChooseTargetCommand
+        {
+            get
+            {
+                _chooseTargetCommand = _chooseTargetCommand ?? new DelegateCommand(ChooseTarget);
+                return _chooseTargetCommand;
+            }
+        }
+
+        public ICommand ChooseContactCommand
+        {
+            get
+            {
+                _chooseContactCommand = _chooseContactCommand ?? new DelegateCommand(ChooseContact);
+                return _chooseContactCommand;
+            }
+        }
+
+        public ICommand EncryptCommand
+        {
+            get
+            {
+                _encryptCommand = _encryptCommand ?? new DelegateCommand(Encrypt);
+                return _encryptCommand;
+            }
+        }
+
+        public ICommand DecryptCommand
+        {
+            get
+            {
+                _decryptCommand = _decryptCommand ?? new DelegateCommand(Decrypt);
+                return _decryptCommand;
+            }
+        }
+
+        public string ContactName
+        {
+            get { return _contactName; }
+            set
+            {
+                if (value != null && value != _contactName)
+                {
+                    _contactName = value;
+                    RaisePropertyChanged("ContactName");
+                }
+            }
+        }
+
         #endregion Properties
 
         #region Private Methods
@@ -102,16 +204,24 @@ namespace SecureFileShare.App.ViewModels
 
         private void OpenContacts(object obj)
         {
+            //TODO: refactoring
+
             if (_contactsView == null)
             {
                 _logger.Info("show contacts view");
                 _contactsView = Container.Resolve<ContactsView>();
                 _contactsView.Show();
+
+                var viewmodel = (ContactsViewModel)_contactsView.DataContext;
+                viewmodel.IsSelectionMode = false;
             }
             else
             {
                 _logger.Warn("contacts view already open");
                 _logger.Info("push view in foreground");
+
+                var viewmodel = (ContactsViewModel)_contactsView.DataContext;
+                viewmodel.IsSelectionMode = false;
 
                 _contactsView.Focus();
             }
@@ -151,7 +261,7 @@ namespace SecureFileShare.App.ViewModels
                 _database.Update(login);
                 _logger.Info("login with new keys updated");
 
-                _messenger.Send(new AssignNewKeysSuccsess());
+                _messenger.Send(new AssignNewKeysSuccsessMsg());
             }
             else
             {
@@ -187,14 +297,78 @@ namespace SecureFileShare.App.ViewModels
             }
         }
 
-        private void OnContactsViewClosedMsg(ContactsViewClosedMsg obj)
+        private void OnContactsViewClosedMsg(ContactsViewClosedMsg msg)
         {
             _logger.Info("set contacts view to null");
             _contactsView = null;
         }
 
-        #endregion Private Methods
+        private void ChooseSource(object obj)
+        {
+            _messenger.Send(new ChooseSourceRequestMsg());
+        }
 
-        
+        private void ChooseTarget(object obj)
+        {
+            _messenger.Send(new ChooseTargetRequestMsg());
+        }
+
+        private void ChooseContact(object obj)
+        {
+            //TODO: refactoring
+
+            if (_contactsView == null)
+            {
+                _logger.Info("show contacts view");
+                _contactsView = Container.Resolve<ContactsView>();
+                _contactsView.Show();
+
+                var viewmodel = (ContactsViewModel) _contactsView.DataContext;
+                viewmodel.IsSelectionMode = true;
+            }
+            else
+            {
+                _logger.Warn("contacts view already open");
+                _logger.Info("push view in foreground");
+
+                var viewmodel = (ContactsViewModel)_contactsView.DataContext;
+                viewmodel.IsSelectionMode = true;
+
+                _contactsView.Focus();
+            }
+        }
+
+        private void Encrypt(object obj)
+        {
+            //TODO: target fileEx => sfs
+            throw new System.NotImplementedException();
+        }
+
+        private void Decrypt(object obj)
+        {
+            //TODO: target fileEx => get from file
+            throw new System.NotImplementedException();
+        }
+
+        private void OnChooseTargetConfirmMsg(ChooseTargetConfirmMsg msg)
+        {
+            _logger.Info("setting target paht to: " + msg.Filename);
+            TargetFilepath = msg.Filename;
+        }
+
+        private void OnChooseSourceConfirmMsg(ChooseSourceConfirmMsg msg)
+        {
+            _logger.Info("setting source paht to: " + msg.Filename);
+            SourceFilepath = msg.Filename;
+        }
+
+        private void OnContactSelectedMsg(ContactSelectedMsg msg)
+        {
+            _logger.Info("contact selected for en-/decryption: " + msg.Contact.Name);
+            ContactName = msg.Contact.Name;
+            PublicKey = msg.Contact.PublicKey;
+        }
+
+        #endregion Private Methods
     }
 }

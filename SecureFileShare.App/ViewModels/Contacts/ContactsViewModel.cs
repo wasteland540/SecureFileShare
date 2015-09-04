@@ -202,9 +202,13 @@ namespace SecureFileShare.App.ViewModels.Contacts
         {
             if (IsSelectionMode)
             {
-                throw new NotImplementedException();
+                _messenger.Send(new ContactSelectedMsg(_selectedContact));
+                //TODO: close view!
             }
-            Edit(null);
+            else
+            {
+                Edit(null);
+            }
         }
 
         private void OnAddEditContactViewClosedMsg(AddEditContactViewClosedMsg msg)

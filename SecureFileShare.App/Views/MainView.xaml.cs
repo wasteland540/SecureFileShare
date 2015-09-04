@@ -20,12 +20,14 @@ namespace SecureFileShare.App.Views
 
             _messenger = messenger;
             _messenger.Register<AssignNewKeysRequestMsg>(this, OnAssignNewKeysRequestMsg);
-            _messenger.Register<AssignNewKeysSuccsess>(this, OnAssignNewKeysSuccsess);
+            _messenger.Register<AssignNewKeysSuccsessMsg>(this, OnAssignNewKeysSuccsess);
             _messenger.Register<ExportPublicKeyRequestMsg>(this, OnExportPublicKeyRequestMsg);
             _messenger.Register<ExportPublicKeySuccsessMsg>(this, OnExportPublicKeySuccsessMsg);
             _messenger.Register<ExportPublicKeyFailedMsg>(this, OnExportPublicKeyFailedMsg);
+            _messenger.Register<ChooseSourceRequestMsg>(this, OnChooseSourceRequestMsg);
+            _messenger.Register<ChooseTargetRequestMsg>(this, OnChooseTargetRequestMsg);
         }
-        
+
         [Dependency]
         public MainViewModel ViewModel
         {
@@ -34,21 +36,21 @@ namespace SecureFileShare.App.Views
 
         #region Private Methods
 
-        private void OnExportPublicKeyFailedMsg(ExportPublicKeyFailedMsg obj)
+        private void OnExportPublicKeyFailedMsg(ExportPublicKeyFailedMsg msg)
         {
             MessageBox.Show(
                 "Something went wrong, please try again and start the application with admin access!", "Failed",
                 MessageBoxButton.OK, MessageBoxImage.Error);
         }
 
-        private void OnExportPublicKeySuccsessMsg(ExportPublicKeySuccsessMsg obj)
+        private void OnExportPublicKeySuccsessMsg(ExportPublicKeySuccsessMsg msg)
         {
             MessageBox.Show(
                 "Key file exported!", "Success",
                 MessageBoxButton.OK, MessageBoxImage.Asterisk);
         }
 
-        private void OnExportPublicKeyRequestMsg(ExportPublicKeyRequestMsg obj)
+        private void OnExportPublicKeyRequestMsg(ExportPublicKeyRequestMsg msg)
         {
             var saveFileDialog = new SaveFileDialog { DefaultExt = "key", Filter = "Public Key File (*.key)| *.key" };
             var dialogResult = saveFileDialog.ShowDialog();
@@ -60,14 +62,14 @@ namespace SecureFileShare.App.Views
             }
         }
 
-        private void OnAssignNewKeysSuccsess(AssignNewKeysSuccsess obj)
+        private void OnAssignNewKeysSuccsess(AssignNewKeysSuccsessMsg msg)
         {
             MessageBox.Show(
                 "Now, you have new keys!\nPlease inform your friend and send them your new public key file!", "Success",
                 MessageBoxButton.OK, MessageBoxImage.Asterisk);
         }
 
-        private void OnAssignNewKeysRequestMsg(AssignNewKeysRequestMsg obj)
+        private void OnAssignNewKeysRequestMsg(AssignNewKeysRequestMsg msg)
         {
             var result = MessageBox.Show(
                 "Are you sure, you want a new key pari?\nYou have to inform your friend and have to send them your new public key file.",
@@ -76,6 +78,30 @@ namespace SecureFileShare.App.Views
             if (result == MessageBoxResult.Yes)
             {
                 _messenger.Send(new AssignNewKeysConfirmMsg());
+            }
+        }
+
+        private void OnChooseTargetRequestMsg(ChooseTargetRequestMsg msg)
+        {
+            var saveFileDialog = new SaveFileDialog();
+            var dialogResult = saveFileDialog.ShowDialog();
+
+            if (dialogResult != null && dialogResult.Value)
+            {
+                var filename = saveFileDialog.FileName;
+                _messenger.Send(new ChooseTargetConfirmMsg(filename));
+            }
+        }
+
+        private void OnChooseSourceRequestMsg(ChooseSourceRequestMsg msg)
+        {
+            var openFileDialog = new OpenFileDialog();
+            var dialogResult = openFileDialog.ShowDialog();
+
+            if (dialogResult != null && dialogResult.Value)
+            {
+                var filename = openFileDialog.FileName;
+                _messenger.Send(new ChooseSourceConfirmMsg(filename));
             }
         }
 

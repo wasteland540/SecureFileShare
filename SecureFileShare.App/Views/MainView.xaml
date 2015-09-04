@@ -17,8 +17,21 @@
                 <MenuItem Header="Export my public key" Command="{Binding ExportPublicKeyCommand}"/>
             </MenuItem>
             <MenuItem Header="Help">
-                
+
             </MenuItem>
         </Menu>
+        <Rectangle Fill="#FFF4F4F5" HorizontalAlignment="Left" Height="148" Margin="10,136,0,0" Stroke="Black" VerticalAlignment="Top" Width="497"/>
+        <TextBlock HorizontalAlignment="Left" Margin="70,179,0,0" TextWrapping="Wrap" Text="Please choose a file via 'Choose file...' button or drag a file in this area." VerticalAlignment="Top"/>
+        <TextBox Text="{Binding SourceFilepath}" HorizontalAlignment="Left" Height="23" Margin="70,30,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="335"/>
+        <Button Content="Choose file..." Command="{Binding ChooseSourceCommand}" HorizontalAlignment="Left" Margin="410,29,0,0" VerticalAlignment="Top" Width="97" Height="24"/>
+        <Label Content="Target:" HorizontalAlignment="Left" Margin="10,58,0,0" VerticalAlignment="Top"/>
+        <TextBox Text="{Binding TargetFilepath}" HorizontalAlignment="Left" Height="23" Margin="70,61,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="335"/>
+        <Button Content="Choose file..." Command="{Binding ChooseTargetCommand}" HorizontalAlignment="Left" Margin="410,61,0,0" VerticalAlignment="Top" Width="97" Height="24"/>
+        <Label Content="Source:" HorizontalAlignment="Left" Margin="10,27,0,0" VerticalAlignment="Top"/>
+        <Button Content="Encrypt" HorizontalAlignment="Left" Margin="432,289,0,0" VerticalAlignment="Top" Width="75"/>
+        <Button Content="Decrypt" HorizontalAlignment="Left" Margin="352,289,0,0" VerticalAlignment="Top" Width="75"/>
+        <Label Content="Sender/Receipient:" HorizontalAlignment="Left" Margin="10,89,0,0" VerticalAlignment="Top"/>
+        <TextBox Text="{Binding ContactName}" HorizontalAlignment="Left" Height="23" Margin="125,92,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="280"/>
+        <Button Content="Choose..." Command="{Binding ChooseContactCommand}" HorizontalAlignment="Left" Margin="410,92,0,0" VerticalAlignment="Top" Width="97" Height="23"/>
     </Grid>
 </Window>
