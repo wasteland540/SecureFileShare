@@ -17,7 +17,6 @@ namespace SecureFileShareUnitTests.Util.FileIO
             {
                 Data = new byte[] { 1, 2 },
                 FileExtension = new byte[] { 3, 4},
-                Filename = "forInternalUse.sfs",
                 Hmac = new byte[] { 5, 6},
                 Iv = new byte[] { 7, 8},
                 SessionKey = new byte[] { 9, 10}
@@ -42,7 +41,6 @@ namespace SecureFileShareUnitTests.Util.FileIO
             {
                 Data = new byte[] { 1, 2 },
                 FileExtension = new byte[] { 3, 4 },
-                Filename = "forInternalUse.sfs",
                 Hmac = new byte[] { 5, 6 },
                 Iv = new byte[] { 7, 8 },
                 SessionKey = new byte[] { 9, 10 }
@@ -52,7 +50,6 @@ namespace SecureFileShareUnitTests.Util.FileIO
             Assert.IsTrue(File.Exists(filePath));
 
             var deserializedObj = BinarySerializer.Deserialize<EncryptedFile>(filePath);
-            Assert.IsTrue(deserializedObj.Filename == objToSerialize.Filename);
             Assert.IsTrue(deserializedObj.Data[0] == objToSerialize.Data[0]);
             Assert.IsTrue(deserializedObj.Data[1] == objToSerialize.Data[1]);
             Assert.IsTrue(deserializedObj.FileExtension[0] == objToSerialize.FileExtension[0]);

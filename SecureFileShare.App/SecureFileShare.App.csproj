@@ -43,6 +43,9 @@
     <Reference Include="GalaSoft.MvvmLight.Platform">
       <HintPath>..\packages\MvvmLightLibs.5.2.0.0\lib\net45\GalaSoft.MvvmLight.Platform.dll</HintPath>
     </Reference>
+    <Reference Include="GongSolutions.Wpf.DragDrop">
+      <HintPath>..\packages\gong-wpf-dragdrop.0.1.4.3\lib\net40\GongSolutions.Wpf.DragDrop.dll</HintPath>
+    </Reference>
     <Reference Include="log4net">
       <HintPath>..\packages\log4net.2.0.3\lib\net40-full\log4net.dll</HintPath>
     </Reference>
@@ -92,10 +95,14 @@
     <Compile Include="Messages\ChooseSourceRequestMsg.cs" />
     <Compile Include="Messages\ChooseTargetConfirmMsg.cs" />
     <Compile Include="Messages\ChooseTargetRequestMsg.cs" />
+    <Compile Include="Messages\CloseContactsViewMsg.cs" />
     <Compile Include="Messages\ContactSelectedMsg.cs" />
     <Compile Include="Messages\ContactsViewClosedMsg.cs" />
+    <Compile Include="Messages\DecryptionFailedMsg.cs" />
+    <Compile Include="Messages\DecryptionSuccsessMsg.cs" />
     <Compile Include="Messages\DeleteContactConfirmMsg.cs" />
     <Compile Include="Messages\DeleteContactRequestMsg.cs" />
+    <Compile Include="Messages\EncryptionSuccsessMsg.cs" />
     <Compile Include="Messages\ExportPublicKeyConfirmMsg.cs" />
     <Compile Include="Messages\ExportPublicKeyFailedMsg.cs" />
     <Compile Include="Messages\ExportPublicKeyRequestMsg.cs" />
@@ -197,6 +204,10 @@
     <ProjectReference Include="..\SecureFileShare.Security\SecureFileShare.Security.csproj">
       <Project>{6DE8CE7D-967B-408C-BA48-BBA9296D99CA}</Project>
       <Name>SecureFileShare.Security</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\SecureFileShare.Util\SecureFileShare.Util.csproj">
+      <Project>{8EB4BAB9-4035-4183-8C51-27B3CA6E69A4}</Project>
+      <Name>SecureFileShare.Util</Name>
     </ProjectReference>
   </ItemGroup>
   <ItemGroup />

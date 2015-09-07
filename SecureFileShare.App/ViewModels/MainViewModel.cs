@@ -1,8 +1,11 @@
-﻿using System.Linq;
+﻿using System.Collections.Generic;
+using System.IO;
+using System.Linq;
 using System.Security.Cryptography;
 using System.Windows;
 using System.Windows.Input;
 using GalaSoft.MvvmLight.Messaging;
+using GongSolutions.Wpf.DragDrop;
 using log4net;
 using Microsoft.Practices.Unity;
 using SecureFileShare.App.Commands;
@@ -13,36 +16,34 @@ using SecureFileShare.App.Views.Contacts;
 using SecureFileShare.App.Views.MyAccount;
 using SecureFileShare.DataAccessLayer;
 using SecureFileShare.Model;
+using SecureFileShare.Util.FileIO;
 
 namespace SecureFileShare.App.ViewModels
 {
-    public class MainViewModel : ViewModelBase
+    public class MainViewModel : ViewModelBase, IDropTarget
     {
-        private readonly ILog _logger = LogManager.GetLogger(typeof (MainViewModel));
+        private const string SecureFileShareExtension = ".sfs";
         private readonly ICryptographyService _cryptographyService;
-        private readonly IMessenger _messenger;
         private readonly IDataAccessLayer _database;
+        private readonly ILog _logger = LogManager.GetLogger(typeof (MainViewModel));
+        private readonly IMessenger _messenger;
 
-        private ContactsView _contactsView;
-
-        private ICommand _exitCommand;
-        private ICommand _openContactsCommand;
-        private ICommand _changePasswordCommand;
         private ICommand _assignNewKeysCommand;
-        private ICommand _exportPublicKeyCommand;
-
-        private string _sourceFilepath;
-        private string _targetFilepath;
+        private ICommand _changePasswordCommand;
+        private ICommand _chooseContactCommand;
         private ICommand _chooseSourceCommand;
         private ICommand _chooseTargetCommand;
-        private ICommand _chooseContactCommand;
-        private ICommand _encryptCommand;
-        private ICommand _decryptCommand;
         private string _contactName;
-        public RSAParameters PublicKey { get; set; }
-
-
-        //TODO: properties for enable disable en/decrypt btn! (check fileending!)
+        private ContactsView _contactsView;
+        private ICommand _decryptCommand;
+        private bool _disableForEncryption = true;
+        private ICommand _encryptCommand;
+        private ICommand _exitCommand;
+        private ICommand _exportPublicKeyCommand;
+        private bool _isProcessInProgress;
+        private ICommand _openContactsCommand;
+        private string _sourceFilepath;
+        private string _targetFilepath;
 
         public MainViewModel(ICryptographyService cryptographyService, IMessenger messenger, IDataAccessLayer database)
         {
@@ -114,6 +115,7 @@ namespace SecureFileShare.App.ViewModels
                 if (value != null && value != _sourceFilepath)
                 {
                     _sourceFilepath = value;
+                    DisableForEncryption = !IsVaildFile();
                     RaisePropertyChanged("SourceFilepath");
                 }
             }
@@ -190,38 +192,91 @@ namespace SecureFileShare.App.ViewModels
             }
         }
 
+        public bool DisableForEncryption
+        {
+            get { return _disableForEncryption; }
+            set
+            {
+                _disableForEncryption = value;
+                RaisePropertyChanged("DisableForEncryption");
+            }
+        }
+
         #endregion Properties
 
         #region Private Methods
 
+        public void DragOver(IDropInfo dropInfo)
+        {
+            IEnumerable<string> dragFileList = ((DataObject) dropInfo.Data).GetFileDropList().Cast<string>();
+            IList<string> fileList = dragFileList as IList<string> ?? dragFileList.ToList();
+
+            if (fileList.Count() == 1)
+            {
+                dropInfo.Effects = fileList.Any(item =>
+                {
+                    string extension = Path.GetExtension(item);
+                    return extension != null;
+                })
+                    ? DragDropEffects.Copy
+                    : DragDropEffects.None;
+            }
+        }
+
+        public void Drop(IDropInfo dropInfo)
+        {
+            IEnumerable<string> dragFileList = ((DataObject) dropInfo.Data).GetFileDropList().Cast<string>();
+            IList<string> fileList = dragFileList as IList<string> ?? dragFileList.ToList();
+
+            if (fileList.Count() == 1)
+            {
+                dropInfo.Effects = fileList.Any(item =>
+                {
+                    string extension = Path.GetExtension(item);
+                    return extension != null;
+                })
+                    ? DragDropEffects.Copy
+                    : DragDropEffects.None;
+
+                if (dropInfo.Effects == DragDropEffects.Copy)
+                {
+                    SourceFilepath = fileList.FirstOrDefault();
+                }
+            }
+        }
+
         private void Exit(object obj)
         {
-            //TODO: check if is en-/decryption/export key is in progress? 
-
-            _logger.Info("shutdown application");
-            Application.Current.Shutdown();
+            if (!_isProcessInProgress)
+            {
+                _logger.Info("shutdown application");
+                Application.Current.Shutdown();
+            }
         }
 
         private void OpenContacts(object obj)
         {
-            //TODO: refactoring
+            OpenContactView(false);
+        }
 
+        private void OpenContactView(bool isSelectionMode)
+        {
             if (_contactsView == null)
             {
                 _logger.Info("show contacts view");
                 _contactsView = Container.Resolve<ContactsView>();
                 _contactsView.Show();
 
-                var viewmodel = (ContactsViewModel)_contactsView.DataContext;
-                viewmodel.IsSelectionMode = false;
+                var viewmodel = (ContactsViewModel) _contactsView.DataContext;
+                viewmodel.IsSelectionMode = isSelectionMode;
             }
             else
             {
                 _logger.Warn("contacts view already open");
                 _logger.Info("push view in foreground");
 
-                var viewmodel = (ContactsViewModel)_contactsView.DataContext;
-                viewmodel.IsSelectionMode = false;
+                var viewmodel = (ContactsViewModel) _contactsView.DataContext;
+                viewmodel.IsSelectionMode = isSelectionMode;
 
                 _contactsView.Focus();
             }
@@ -247,7 +302,7 @@ namespace SecureFileShare.App.ViewModels
         private void OnAssignNewKeysConfirmMsg(AssignNewKeysConfirmMsg msg)
         {
             _logger.Info("assign new keys confirmed --> assing new keys");
-            var login = _database.GetAll<MasterLogin>().FirstOrDefault();
+            MasterLogin login = _database.GetAll<MasterLogin>().FirstOrDefault();
 
             if (login != null)
             {
@@ -255,7 +310,7 @@ namespace SecureFileShare.App.ViewModels
                 _cryptographyService.AssignNewKeys();
 
                 login.PublicKey = _cryptographyService.GetPublicKey();
-                login.PrivateKey = _cryptographyService.GetPrivateKey();
+                login.PrivateKey = _cryptographyService.GetPrivateKeyAsXml();
 
                 _logger.Info("update login with new keys");
                 _database.Update(login);
@@ -271,14 +326,16 @@ namespace SecureFileShare.App.ViewModels
 
         private void OnExportPublicKeyConfirmMsg(ExportPublicKeyConfirmMsg msg)
         {
+            _isProcessInProgress = true;
+            UIServices.SetBusyState();
             _logger.Info("export public key confirmed --> export key file");
             _logger.Info("export path: " + msg.Filename);
 
-            var login = _database.GetAll<MasterLogin>().FirstOrDefault();
+            MasterLogin login = _database.GetAll<MasterLogin>().FirstOrDefault();
 
             if (login != null)
             {
-                var success = _cryptographyService.ExportPublicKeyFile(msg.Filename, login.PublicKey);
+                bool success = _cryptographyService.ExportPublicKeyFile(msg.Filename, login.PublicKey);
 
                 if (success)
                 {
@@ -295,6 +352,8 @@ namespace SecureFileShare.App.ViewModels
             {
                 _logger.Error("login is null!");
             }
+
+            _isProcessInProgress = false;
         }
 
         private void OnContactsViewClosedMsg(ContactsViewClosedMsg msg)
@@ -315,39 +374,78 @@ namespace SecureFileShare.App.ViewModels
 
         private void ChooseContact(object obj)
         {
-            //TODO: refactoring
-
-            if (_contactsView == null)
-            {
-                _logger.Info("show contacts view");
-                _contactsView = Container.Resolve<ContactsView>();
-                _contactsView.Show();
-
-                var viewmodel = (ContactsViewModel) _contactsView.DataContext;
-                viewmodel.IsSelectionMode = true;
-            }
-            else
-            {
-                _logger.Warn("contacts view already open");
-                _logger.Info("push view in foreground");
-
-                var viewmodel = (ContactsViewModel)_contactsView.DataContext;
-                viewmodel.IsSelectionMode = true;
-
-                _contactsView.Focus();
-            }
+            OpenContactView(true);
         }
 
         private void Encrypt(object obj)
         {
-            //TODO: target fileEx => sfs
-            throw new System.NotImplementedException();
+            _isProcessInProgress = true;
+            UIServices.SetBusyState();
+
+            _logger.Info("start encryption");
+            _logger.Info("source: " + _sourceFilepath);
+            _logger.Info("destination: " + _targetFilepath);
+            _logger.Info("receipient: " + _contactName);
+
+            _cryptographyService.EncryptFile(_sourceFilepath, _targetFilepath, PublicKey);
+            _messenger.Send(new EncryptionSuccsessMsg());
+
+            //reset inputs
+            SourceFilepath = string.Empty;
+            TargetFilepath = string.Empty;
+            ContactName = string.Empty;
+
+            _disableForEncryption = true;
+            _isProcessInProgress = false;
         }
 
         private void Decrypt(object obj)
         {
-            //TODO: target fileEx => get from file
-            throw new System.NotImplementedException();
+            _isProcessInProgress = true;
+            UIServices.SetBusyState();
+
+            _logger.Info("start decryption");
+            _logger.Info("source: " + SourceFilepath);
+            _logger.Info("destination: " + TargetFilepath);
+            _logger.Info("sender: " + ContactName);
+
+            if (IsVaildFile())
+            {
+                MasterLogin login = _database.GetAll<MasterLogin>().FirstOrDefault();
+
+                if (login != null)
+                {
+                    bool isDecryped = _cryptographyService.DecryptFile(_sourceFilepath, _targetFilepath,
+                        login.PrivateKey);
+
+                    if (isDecryped)
+                    {
+                        _messenger.Send(new DecryptionSuccsessMsg());
+                    }
+                    else
+                    {
+                        _logger.Error("file can not decrypt!");
+                        _messenger.Send(new DecryptionFailedMsg());
+                    }
+
+                    //reset inputs
+                    SourceFilepath = string.Empty;
+                    TargetFilepath = string.Empty;
+                    ContactName = string.Empty;
+                }
+                else
+                {
+                    _logger.Error("login is null!");
+                }
+            }
+            else
+            {
+                _logger.Error("file is not vaild for encryption! maybe encrpytion?");
+                _messenger.Send(new DecryptionFailedMsg());
+            }
+
+            _disableForEncryption = true;
+            _isProcessInProgress = false;
         }
 
         private void OnChooseTargetConfirmMsg(ChooseTargetConfirmMsg msg)
@@ -369,6 +467,46 @@ namespace SecureFileShare.App.ViewModels
             PublicKey = msg.Contact.PublicKey;
         }
 
+        private bool IsVaildFile()
+        {
+            bool isVaild = false;
+            string extension = Path.GetExtension(_sourceFilepath);
+
+            if (extension != null)
+            {
+                _logger.Info("check extension");
+                if (extension.ToLower() == SecureFileShareExtension.ToLower())
+                {
+                    _logger.Info("extension check success");
+
+                    _logger.Info("content check");
+                    var encryptedFile = BinarySerializer.Deserialize<EncryptedFile>(_sourceFilepath);
+
+                    if (encryptedFile != null)
+                    {
+                        _logger.Info("content check success");
+                        isVaild = true;
+                    }
+                    else
+                    {
+                        _logger.Error("content check failed");
+                    }
+                }
+                else
+                {
+                    _logger.Info("extension check faild");
+                }
+            }
+            else
+            {
+                _logger.Error("extension is null!");
+            }
+
+            return isVaild;
+        }
+
         #endregion Private Methods
+
+        public RSAParameters PublicKey { get; set; }
     }
 }

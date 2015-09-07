@@ -1,12 +1,14 @@
-﻿using System;
-using System.IO;
+﻿using System.IO;
 using System.Runtime.Serialization;
 using System.Runtime.Serialization.Formatters.Binary;
+using log4net;
 
 namespace SecureFileShare.Util.FileIO
 {
     public class BinarySerializer
     {
+        private static readonly ILog Logger = LogManager.GetLogger(typeof (BinarySerializer));
+
         public static void Serialize(string filePath, object obj)
         {
             using (var fileStream = new FileStream(filePath, FileMode.Create))
@@ -19,8 +21,7 @@ namespace SecureFileShare.Util.FileIO
                 }
                 catch (SerializationException e)
                 {
-                    //TODO: loggen!!!!
-                    Console.WriteLine("Failed to serialize. Reason: " + e.Message);
+                    Logger.Error("Failed to serialize. Reason: " + e.Message);
                     throw;
                 }
                 finally
@@ -44,8 +45,7 @@ namespace SecureFileShare.Util.FileIO
                 }
                 catch (SerializationException e)
                 {
-                    //TODO: loggen!!!!
-                    Console.WriteLine("Failed to deserialize. Reason: " + e.Message);
+                    Logger.Error("Failed to deserialize. Reason: " + e.Message);
                     throw;
                 }
                 finally

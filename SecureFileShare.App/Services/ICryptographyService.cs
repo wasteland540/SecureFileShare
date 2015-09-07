@@ -16,12 +16,14 @@ namespace SecureFileShare.App.Services
 
         RSAParameters GetPrivateKey();
 
+        string GetPrivateKeyAsXml();
+
         bool ExportPublicKeyFile(string destinationFilename, RSAParameters publicKey);
 
         RSAParameters ImportPublicKeyFile(string sourceFilename);
 
         void EncryptFile(string sourceFilename, string destinationFilename, RSAParameters publicKey);
 
-        void DecryptFile(string sourceFilename, string destinationFilename, RSAParameters privateKey);
+        bool DecryptFile(string sourceFilename, string destinationFilename, string privateKey);
     }
 }

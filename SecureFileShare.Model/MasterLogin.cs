@@ -8,6 +8,6 @@ namespace SecureFileShare.Model
         public byte[] Salt { get; set; }
         public string Name { get; set; }
         public RSAParameters PublicKey { get; set; }
-        public RSAParameters PrivateKey { get; set; }
+        public string PrivateKey { get; set; }
     }
 }

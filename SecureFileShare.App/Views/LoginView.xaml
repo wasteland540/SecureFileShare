@@ -3,7 +3,7 @@
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:converters="clr-namespace:SecureFileShare.App.Converters"
-        Title="Secure File Share - Login" Height="300" Width="370" ResizeMode="NoResize">
+        Title="Secure File Share - Login" Height="300" Width="380" ResizeMode="NoResize">
     <Window.Resources>
         <converters:CommandParameterConverter x:Key="CommandParameterConverter" />
     </Window.Resources>

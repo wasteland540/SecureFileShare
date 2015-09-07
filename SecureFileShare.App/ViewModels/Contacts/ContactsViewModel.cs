@@ -203,7 +203,7 @@ namespace SecureFileShare.App.ViewModels.Contacts
             if (IsSelectionMode)
             {
                 _messenger.Send(new ContactSelectedMsg(_selectedContact));
-                //TODO: close view!
+                _messenger.Send(new CloseContactsViewMsg());
             }
             else
             {

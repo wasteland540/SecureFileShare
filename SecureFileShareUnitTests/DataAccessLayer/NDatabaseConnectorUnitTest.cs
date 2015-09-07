@@ -89,7 +89,7 @@ namespace SecureFileShareUnitTests.DataAccessLayer
                 Name = "MasterMan",
                 Password = PBKDF2Impl.HashPassword(Encoding.UTF8.GetBytes("password123"), salt),
                 Salt = salt,
-                PrivateKey = hybridEncrypter.GetPrivateRSAKey(),
+                PrivateKey = hybridEncrypter.GetPrivateRSAKeyAsXml(),
                 PublicKey = hybridEncrypter.GetPublicRSAKey()
             };
             _dataAccess.Insert(materLogin);
@@ -171,7 +171,7 @@ namespace SecureFileShareUnitTests.DataAccessLayer
                 Name = "MasterMan",
                 Password = PBKDF2Impl.HashPassword(Encoding.UTF8.GetBytes("password123"), salt),
                 Salt = salt,
-                PrivateKey = hybridEncrypter.GetPrivateRSAKey(),
+                PrivateKey = hybridEncrypter.GetPrivateRSAKeyAsXml(),
                 PublicKey = hybridEncrypter.GetPublicRSAKey()
             };
             _dataAccess.Insert(materLogin);

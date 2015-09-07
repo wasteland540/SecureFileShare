@@ -1,14 +1,19 @@
-﻿using System.IO;
+﻿using System;
+using System.IO;
 using System.Security.Cryptography;
+using log4net;
 
 namespace SecureFileShare.Security.Cryptography
 {
     //TODO: logging
     public class HybridRsaAes : AbstractSecureCompareBase
     {
+        private readonly ILog _logger = LogManager.GetLogger(typeof(HybridRsaAes));
+
         private RSAParameters _privateKey;
         private RSAParameters _publicKey;
         private string _publicKeyAsXml;
+        private string _privateKeyAsXml;
 
         // ReSharper disable once InconsistentNaming
         public byte[] EncryptAES(byte[] dataToEncrypt, byte[] key, byte[] iv)
@@ -69,6 +74,7 @@ namespace SecureFileShare.Security.Cryptography
                 _privateKey = rsa.ExportParameters(true);
 
                 _publicKeyAsXml = rsa.ToXmlString(false);
+                _privateKeyAsXml = rsa.ToXmlString(true);
             }
         }
 
@@ -91,14 +97,22 @@ namespace SecureFileShare.Security.Cryptography
         // ReSharper disable once InconsistentNaming
         public byte[] DecryptRSA(byte[] dataToDecrypt, RSAParameters privateKey)
         {
-            byte[] plainBytes;
+            byte[] plainBytes = null;
 
             using (var rsa = new RSACryptoServiceProvider(2048))
             {
                 rsa.PersistKeyInCsp = false;
-
                 rsa.ImportParameters(privateKey);
-                plainBytes = rsa.Decrypt(dataToDecrypt, false);
+
+                try
+                {
+                    plainBytes = rsa.Decrypt(dataToDecrypt, false);
+                }
+                catch (Exception e)
+                {
+                    _logger.Error("error by decrypting data! --> " + e.Message);
+                }
+                
             }
 
             return plainBytes;
@@ -138,6 +152,12 @@ namespace SecureFileShare.Security.Cryptography
         public string GetPublicRSAKeyAsXml()
         {
             return _publicKeyAsXml;
+        }
+
+        // ReSharper disable once InconsistentNaming
+        public string GetPrivateRSAKeyAsXml()
+        {
+            return _privateKeyAsXml;
         }
     }
 }

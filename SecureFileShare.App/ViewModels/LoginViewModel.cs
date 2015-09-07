@@ -156,7 +156,7 @@ namespace SecureFileShare.App.ViewModels
                                 Name = _login,
                                 Password = hashedPassword,
                                 Salt = salt,
-                                PrivateKey = _cryptographyService.GetPrivateKey(),
+                                PrivateKey = _cryptographyService.GetPrivateKeyAsXml(),
                                 PublicKey = _cryptographyService.GetPublicKey(),
                             };
 

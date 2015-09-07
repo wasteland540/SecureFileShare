@@ -26,6 +26,9 @@ namespace SecureFileShare.App.Views
             _messenger.Register<ExportPublicKeyFailedMsg>(this, OnExportPublicKeyFailedMsg);
             _messenger.Register<ChooseSourceRequestMsg>(this, OnChooseSourceRequestMsg);
             _messenger.Register<ChooseTargetRequestMsg>(this, OnChooseTargetRequestMsg);
+            _messenger.Register<EncryptionSuccsessMsg>(this, OnEncryptionSuccsessMsg);
+            _messenger.Register<DecryptionSuccsessMsg>(this, OnDecryptionSuccsessMsg);
+            _messenger.Register<DecryptionFailedMsg>(this, OnDecryptionFailedMsg);
         }
 
         [Dependency]
@@ -52,12 +55,12 @@ namespace SecureFileShare.App.Views
 
         private void OnExportPublicKeyRequestMsg(ExportPublicKeyRequestMsg msg)
         {
-            var saveFileDialog = new SaveFileDialog { DefaultExt = "key", Filter = "Public Key File (*.key)| *.key" };
-            var dialogResult = saveFileDialog.ShowDialog();
+            var saveFileDialog = new SaveFileDialog {DefaultExt = "key", Filter = "Public Key File (*.key)| *.key"};
+            bool? dialogResult = saveFileDialog.ShowDialog();
 
             if (dialogResult != null && dialogResult.Value)
             {
-                var filename = saveFileDialog.FileName;
+                string filename = saveFileDialog.FileName;
                 _messenger.Send(new ExportPublicKeyConfirmMsg(filename));
             }
         }
@@ -71,7 +74,7 @@ namespace SecureFileShare.App.Views
 
         private void OnAssignNewKeysRequestMsg(AssignNewKeysRequestMsg msg)
         {
-            var result = MessageBox.Show(
+            MessageBoxResult result = MessageBox.Show(
                 "Are you sure, you want a new key pari?\nYou have to inform your friend and have to send them your new public key file.",
                 "Security Check", MessageBoxButton.YesNo, MessageBoxImage.Question);
 
@@ -84,11 +87,11 @@ namespace SecureFileShare.App.Views
         private void OnChooseTargetRequestMsg(ChooseTargetRequestMsg msg)
         {
             var saveFileDialog = new SaveFileDialog();
-            var dialogResult = saveFileDialog.ShowDialog();
+            bool? dialogResult = saveFileDialog.ShowDialog();
 
             if (dialogResult != null && dialogResult.Value)
             {
-                var filename = saveFileDialog.FileName;
+                string filename = saveFileDialog.FileName;
                 _messenger.Send(new ChooseTargetConfirmMsg(filename));
             }
         }
@@ -96,13 +99,34 @@ namespace SecureFileShare.App.Views
         private void OnChooseSourceRequestMsg(ChooseSourceRequestMsg msg)
         {
             var openFileDialog = new OpenFileDialog();
-            var dialogResult = openFileDialog.ShowDialog();
+            bool? dialogResult = openFileDialog.ShowDialog();
 
             if (dialogResult != null && dialogResult.Value)
             {
-                var filename = openFileDialog.FileName;
+                string filename = openFileDialog.FileName;
                 _messenger.Send(new ChooseSourceConfirmMsg(filename));
             }
+        }
+
+        private void OnDecryptionFailedMsg(DecryptionFailedMsg obj)
+        {
+            MessageBox.Show(
+                "Something went wrong, please try again and start the application with admin access!", "Failed",
+                MessageBoxButton.OK, MessageBoxImage.Error);
+        }
+
+        private void OnDecryptionSuccsessMsg(DecryptionSuccsessMsg obj)
+        {
+            MessageBox.Show(
+                "File decrypted!", "Success",
+                MessageBoxButton.OK, MessageBoxImage.Asterisk);
+        }
+
+        private void OnEncryptionSuccsessMsg(EncryptionSuccsessMsg obj)
+        {
+            MessageBox.Show(
+                "File encrypted!", "Success",
+                MessageBoxButton.OK, MessageBoxImage.Asterisk);
         }
 
         #endregion Private Methods

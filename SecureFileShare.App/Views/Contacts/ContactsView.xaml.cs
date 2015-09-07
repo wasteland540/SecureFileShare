@@ -22,6 +22,7 @@ namespace SecureFileShare.App.Views.Contacts
             _messenger = messenger;
 
             _messenger.Register<DeleteContactRequestMsg>(this, OnDeleteContactRequestMsg);
+            _messenger.Register<CloseContactsViewMsg>(this, OnCloseContactsViewMsg);
         }
 
         [Dependency]
@@ -55,6 +56,11 @@ namespace SecureFileShare.App.Views.Contacts
             {
                 _messenger.Send(new DeleteContactConfirmMsg());
             }
+        }
+
+        private void OnCloseContactsViewMsg(CloseContactsViewMsg obj)
+        {
+            Close();
         }
 
         #endregion Private Methods
