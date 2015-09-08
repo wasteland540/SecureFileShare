@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Security.Cryptography;
@@ -240,7 +241,15 @@ namespace SecureFileShare.App.ViewModels
 
                 if (dropInfo.Effects == DragDropEffects.Copy)
                 {
-                    SourceFilepath = fileList.FirstOrDefault();
+                    if (CheckFileSize(fileList.FirstOrDefault()))
+                    {
+                        SourceFilepath = fileList.FirstOrDefault();
+                    }
+                    else
+                    {
+                        _logger.Warn("file size is greater than 100MB --> currently not supported");
+                        _messenger.Send(new FileSizeNotSupportedMsg());
+                    }
                 }
             }
         }
@@ -387,13 +396,21 @@ namespace SecureFileShare.App.ViewModels
             _logger.Info("destination: " + _targetFilepath);
             _logger.Info("receipient: " + _contactName);
 
-            _cryptographyService.EncryptFile(_sourceFilepath, _targetFilepath, PublicKey);
-            _messenger.Send(new EncryptionSuccsessMsg());
+            if (CheckSoureAndTargetPath())
+            {
+                _cryptographyService.EncryptFile(_sourceFilepath, _targetFilepath, PublicKey);
+                _messenger.Send(new EncryptionSuccsessMsg());
 
-            //reset inputs
-            SourceFilepath = string.Empty;
-            TargetFilepath = string.Empty;
-            ContactName = string.Empty;
+                //reset inputs
+                SourceFilepath = string.Empty;
+                TargetFilepath = string.Empty;
+                ContactName = string.Empty;
+            }
+            else
+            {
+                _logger.Error("source and/or target path are not vaild!");
+                _messenger.Send(new SourceTargetInvaildMsg());
+            }
 
             _disableForEncryption = true;
             _isProcessInProgress = false;
@@ -409,39 +426,47 @@ namespace SecureFileShare.App.ViewModels
             _logger.Info("destination: " + TargetFilepath);
             _logger.Info("sender: " + ContactName);
 
-            if (IsVaildFile())
+            if (CheckSoureAndTargetPath())
             {
-                MasterLogin login = _database.GetAll<MasterLogin>().FirstOrDefault();
-
-                if (login != null)
+                if (IsVaildFile())
                 {
-                    bool isDecryped = _cryptographyService.DecryptFile(_sourceFilepath, _targetFilepath,
-                        login.PrivateKey);
+                    MasterLogin login = _database.GetAll<MasterLogin>().FirstOrDefault();
 
-                    if (isDecryped)
+                    if (login != null)
                     {
-                        _messenger.Send(new DecryptionSuccsessMsg());
+                        bool isDecryped = _cryptographyService.DecryptFile(_sourceFilepath, _targetFilepath,
+                            login.PrivateKey);
+
+                        if (isDecryped)
+                        {
+                            _messenger.Send(new DecryptionSuccsessMsg());
+                        }
+                        else
+                        {
+                            _logger.Error("file can not decrypt!");
+                            _messenger.Send(new DecryptionFailedMsg());
+                        }
+
+                        //reset inputs
+                        SourceFilepath = string.Empty;
+                        TargetFilepath = string.Empty;
+                        ContactName = string.Empty;
                     }
                     else
                     {
-                        _logger.Error("file can not decrypt!");
-                        _messenger.Send(new DecryptionFailedMsg());
+                        _logger.Error("login is null!");
                     }
-
-                    //reset inputs
-                    SourceFilepath = string.Empty;
-                    TargetFilepath = string.Empty;
-                    ContactName = string.Empty;
                 }
                 else
                 {
-                    _logger.Error("login is null!");
+                    _logger.Error("file is not vaild for encryption! maybe encrpytion?");
+                    _messenger.Send(new DecryptionFailedMsg());
                 }
             }
             else
             {
-                _logger.Error("file is not vaild for encryption! maybe encrpytion?");
-                _messenger.Send(new DecryptionFailedMsg());
+                _logger.Error("source and/or target path are not vaild!");
+                _messenger.Send(new SourceTargetInvaildMsg());
             }
 
             _disableForEncryption = true;
@@ -456,8 +481,16 @@ namespace SecureFileShare.App.ViewModels
 
         private void OnChooseSourceConfirmMsg(ChooseSourceConfirmMsg msg)
         {
-            _logger.Info("setting source paht to: " + msg.Filename);
-            SourceFilepath = msg.Filename;
+            if (CheckFileSize(msg.Filename))
+            {
+                _logger.Info("setting source paht to: " + msg.Filename);
+                SourceFilepath = msg.Filename;
+            }
+            else
+            {
+                _logger.Warn("file size is greater than 100MB --> currently not supported");
+                _messenger.Send(new FileSizeNotSupportedMsg());
+            }
         }
 
         private void OnContactSelectedMsg(ContactSelectedMsg msg)
@@ -500,6 +533,34 @@ namespace SecureFileShare.App.ViewModels
             else
             {
                 _logger.Error("extension is null!");
+            }
+
+            return isVaild;
+        }
+
+        private bool CheckFileSize(string filename)
+        {
+            var fileInfo = new FileInfo(filename);
+
+            return fileInfo.Length <= (1024*1024*100); //100MB
+        }
+
+        private bool CheckSoureAndTargetPath()
+        {
+            bool isVaild = File.Exists(_sourceFilepath);
+
+            if (isVaild)
+            {
+                var dir = Path.GetDirectoryName(_targetFilepath);
+
+                if (!string.IsNullOrEmpty(dir))
+                {
+                    isVaild = Directory.Exists(dir);
+                }
+                else
+                {
+                    isVaild = false;
+                }
             }
 
             return isVaild;

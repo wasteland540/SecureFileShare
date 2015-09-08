@@ -29,6 +29,8 @@ namespace SecureFileShare.App.Views
             _messenger.Register<EncryptionSuccsessMsg>(this, OnEncryptionSuccsessMsg);
             _messenger.Register<DecryptionSuccsessMsg>(this, OnDecryptionSuccsessMsg);
             _messenger.Register<DecryptionFailedMsg>(this, OnDecryptionFailedMsg);
+            _messenger.Register<FileSizeNotSupportedMsg>(this, OnFileSizeNotSupportedMsg);
+            _messenger.Register<SourceTargetInvaildMsg>(this, OnSourceTargetInvaildMsg);
         }
 
         [Dependency]
@@ -127,6 +129,20 @@ namespace SecureFileShare.App.Views
             MessageBox.Show(
                 "File encrypted!", "Success",
                 MessageBoxButton.OK, MessageBoxImage.Asterisk);
+        }
+
+        private void OnFileSizeNotSupportedMsg(FileSizeNotSupportedMsg obj)
+        {
+            MessageBox.Show(
+               "You can only en-/decrypt files with a size less or equal 100MB!", "File size not supported",
+               MessageBoxButton.OK, MessageBoxImage.Warning);
+        }
+
+        private void OnSourceTargetInvaildMsg(SourceTargetInvaildMsg obj)
+        {
+            MessageBox.Show(
+                "Pleas check the source and target path!", "Failed",
+                MessageBoxButton.OK, MessageBoxImage.Error);
         }
 
         #endregion Private Methods

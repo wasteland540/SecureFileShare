@@ -13,6 +13,22 @@
     <FileAlignment>512</FileAlignment>
     <ProjectTypeGuids>{60dc8134-eba5-43b8-bcc9-bb4bc16c2548};{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}</ProjectTypeGuids>
     <WarningLevel>4</WarningLevel>
+    <IsWebBootstrapper>false</IsWebBootstrapper>
+    <PublishUrl>C:\Users\m.elz.KS21\Desktop\SFS Test\</PublishUrl>
+    <Install>true</Install>
+    <InstallFrom>Disk</InstallFrom>
+    <UpdateEnabled>false</UpdateEnabled>
+    <UpdateMode>Foreground</UpdateMode>
+    <UpdateInterval>7</UpdateInterval>
+    <UpdateIntervalUnits>Days</UpdateIntervalUnits>
+    <UpdatePeriodically>false</UpdatePeriodically>
+    <UpdateRequired>false</UpdateRequired>
+    <MapFileExtensions>true</MapFileExtensions>
+    <ApplicationRevision>2</ApplicationRevision>
+    <ApplicationVersion>1.0.0.%2a</ApplicationVersion>
+    <UseApplicationTrust>false</UseApplicationTrust>
+    <PublishWizardCompleted>true</PublishWizardCompleted>
+    <BootstrapperEnabled>true</BootstrapperEnabled>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <PlatformTarget>AnyCPU</PlatformTarget>
@@ -32,6 +48,21 @@
     <DefineConstants>TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <PropertyGroup>
+    <ApplicationIcon>Resources\secureFileShare.ico</ApplicationIcon>
+  </PropertyGroup>
+  <PropertyGroup>
+    <ManifestCertificateThumbprint>78DBEB4B1023E39EA756352A52C60B91DD8EC881</ManifestCertificateThumbprint>
+  </PropertyGroup>
+  <PropertyGroup>
+    <ManifestKeyFile>SecureFileShare.App_TemporaryKey.pfx</ManifestKeyFile>
+  </PropertyGroup>
+  <PropertyGroup>
+    <GenerateManifests>true</GenerateManifests>
+  </PropertyGroup>
+  <PropertyGroup>
+    <SignManifests>true</SignManifests>
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="GalaSoft.MvvmLight">
@@ -107,14 +138,17 @@
     <Compile Include="Messages\ExportPublicKeyFailedMsg.cs" />
     <Compile Include="Messages\ExportPublicKeyRequestMsg.cs" />
     <Compile Include="Messages\ExportPublicKeySuccsessMsg.cs" />
+    <Compile Include="Messages\FileSizeNotSupportedMsg.cs" />
     <Compile Include="Messages\ImportPublicKeyFileFailedMsg.cs" />
     <Compile Include="Messages\ImportPublicKeyFileSuccuessMsg.cs" />
     <Compile Include="Messages\PasswordChangeMsg.cs" />
     <Compile Include="Messages\SaveContactMsg.cs" />
+    <Compile Include="Messages\SourceTargetInvaildMsg.cs" />
     <Compile Include="Services\UIServices.cs" />
     <Compile Include="ViewModels\Contacts\AddEditContactViewModel.cs" />
     <Compile Include="ViewModels\Contacts\ContactsViewModel.cs" />
     <Compile Include="ViewModels\MyAccount\ChangePasswordViewModel.cs" />
+    <Compile Include="Views\BindingProxy\BindingProxy.cs" />
     <Compile Include="Views\Contacts\AddEditContactView.xaml.cs">
       <DependentUpon>AddEditContactView.xaml</DependentUpon>
     </Compile>
@@ -188,6 +222,7 @@
       <LastGenOutput>Settings.Designer.cs</LastGenOutput>
     </None>
     <AppDesigner Include="Properties\" />
+    <None Include="SecureFileShare.App_TemporaryKey.pfx" />
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />
@@ -210,7 +245,107 @@
       <Name>SecureFileShare.Util</Name>
     </ProjectReference>
   </ItemGroup>
-  <ItemGroup />
+  <ItemGroup>
+    <Resource Include="Resources\application-exit-3.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Resources\book-2.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Resources\book-go.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Resources\document-decrypt.png" />
+    <Resource Include="Resources\document-encrypt.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Resources\edit-4.png" />
+    <Resource Include="Resources\edit-add-4.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Resources\edit-delete-6.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Resources\edit-find.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Resources\help-about-3.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Resources\identity-2.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Resources\kgpg_export.png" />
+    <Resource Include="Resources\kgpg_gen.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Resources\kgpg.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Resources\document-save-5.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Resources\book-open.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Resources\lock-go.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Resources\kgpg_import.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Resources\house.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Resources\drop area.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <BootstrapperPackage Include=".NETFramework,Version=v4.5">
+      <Visible>False</Visible>
+      <ProductName>Microsoft .NET Framework 4.5 %28x86 and x64%29</ProductName>
+      <Install>true</Install>
+    </BootstrapperPackage>
+    <BootstrapperPackage Include="Microsoft.Net.Client.3.5">
+      <Visible>False</Visible>
+      <ProductName>.NET Framework 3.5 SP1 Client Profile</ProductName>
+      <Install>false</Install>
+    </BootstrapperPackage>
+    <BootstrapperPackage Include="Microsoft.Net.Framework.3.5.SP1">
+      <Visible>False</Visible>
+      <ProductName>.NET Framework 3.5 SP1</ProductName>
+      <Install>false</Install>
+    </BootstrapperPackage>
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Resources\secureFileShare.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="Resources\secureFileShare.ico">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+  </ItemGroup>
+  <ItemGroup>
+    <FileAssociation Include=".key">
+      <Visible>False</Visible>
+      <Description>Public key files by Secure File Share application.</Description>
+      <Progid>HKEY_CLASSES_ROOT</Progid>
+      <DefaultIcon>Resources\keyfile.ico</DefaultIcon>
+    </FileAssociation>
+    <FileAssociation Include=".sfs">
+      <Visible>False</Visible>
+      <Description>Files which are encrypted by Secure File Share application.</Description>
+      <Progid>HKEY_CLASSES_ROOT</Progid>
+      <DefaultIcon>Resources\secureFileShare.ico</DefaultIcon>
+    </FileAssociation>
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="secureFileShare.ico" />
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="Resources\keyfile.ico">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.

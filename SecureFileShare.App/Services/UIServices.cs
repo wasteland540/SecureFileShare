@@ -6,14 +6,15 @@ using System.Windows.Threading;
 namespace SecureFileShare.App.Services
 {
     /// <summary>
-    /// By Shakti Prakash Singh
+    ///     By Shakti Prakash Singh
     /// </summary>
+    // ReSharper disable once InconsistentNaming
     public static class UIServices
     {
         /// <summary>
         ///     A value indicating whether the UI is currently busy
         /// </summary>
-        private static bool IsBusy;
+        private static bool _isBusy;
 
         /// <summary>
         ///     Sets the busystate as busy.
@@ -29,13 +30,14 @@ namespace SecureFileShare.App.Services
         /// <param name="busy">if set to <c>true</c> the application is now busy.</param>
         private static void SetBusyState(bool busy)
         {
-            if (busy != IsBusy)
+            if (busy != _isBusy)
             {
-                IsBusy = busy;
+                _isBusy = busy;
                 Mouse.OverrideCursor = busy ? Cursors.Wait : null;
 
-                if (IsBusy)
+                if (_isBusy)
                 {
+                    // ReSharper disable once ObjectCreationAsStatement
                     new DispatcherTimer(TimeSpan.FromSeconds(0), DispatcherPriority.ApplicationIdle,
                         dispatcherTimer_Tick, Application.Current.Dispatcher);
                 }

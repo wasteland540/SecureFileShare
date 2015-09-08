@@ -3,28 +3,59 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:behav="clr-namespace:SecureFileShare.App.Behaviors"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
-        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" mc:Ignorable="d"
-        Title="Secure File Share - Contacts" Height="254" Width="369" ResizeMode="NoResize">
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:bindingProxy="clr-namespace:SecureFileShare.App.Views.BindingProxy"
+        xmlns:model="clr-namespace:SecureFileShare.Model;assembly=SecureFileShare.Model"
+        mc:Ignorable="d"
+        Title="Secure File Share - Contacts" Height="254" Width="454" ResizeMode="NoResize"
+        Icon="../../Resources/secureFileShare.ico">
     <Grid>
         <Label Content="Contacts:" HorizontalAlignment="Left" Margin="10,3,0,0" VerticalAlignment="Top"/>
-        <Rectangle Fill="#FFF4F4F5" HorizontalAlignment="Left" Height="175" Margin="10,29,0,0" Stroke="Black" VerticalAlignment="Top" Width="331"/>
-        <Label Content="Search:" HorizontalAlignment="Left" Margin="15,31,0,0" VerticalAlignment="Top"/>
-        <TextBox Text="{Binding SearchQuery, UpdateSourceTrigger=PropertyChanged}" HorizontalAlignment="Left" Height="23" Margin="68,34,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="140"/>
-        <ListBox ItemsSource="{Binding Contacts}" SelectedItem="{Binding SelectedContact}" behav:DoubleClickSelectorItem.DoubleClickItemCommand="{Binding ContactDoubleClickCommand}"  HorizontalAlignment="Left" Height="128" Margin="24,62,0,0" VerticalAlignment="Top" Width="304">
+        <Rectangle Fill="#FFF4F4F5" HorizontalAlignment="Left" Height="175" Margin="10,29,0,0" Stroke="Black" VerticalAlignment="Top" Width="421"/>
+        <Label HorizontalAlignment="Left" Margin="24,34,0,0" VerticalAlignment="Top" Height="23">
+            <StackPanel Orientation="Horizontal">
+                <Image Source="../../Resources/edit-find.png"/>
+                <TextBlock Text="Search:" VerticalAlignment="Center" HorizontalAlignment="Right"/>
+            </StackPanel>
+        </Label>
+        <TextBox Text="{Binding SearchQuery, UpdateSourceTrigger=PropertyChanged}" HorizontalAlignment="Left" Height="23" Margin="90,34,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="118"/>
+        <ListBox ItemsSource="{Binding Contacts}" SelectedItem="{Binding SelectedContact}" behav:DoubleClickSelectorItem.DoubleClickItemCommand="{Binding ContactDoubleClickCommand}"  HorizontalAlignment="Left" Height="128" Margin="24,62,0,0" VerticalAlignment="Top" Width="396">
+            <ListBox.Resources>
+                <bindingProxy:BindingProxy x:Key="BindingProxy" Data="{Binding}" />
+            </ListBox.Resources>
             <ListBox.ItemTemplate>
-                <DataTemplate>
+                <DataTemplate DataType="model:Contact">
                     <TextBlock Text="{Binding Name}">
                         <TextBlock.ContextMenu>
                             <ContextMenu>
-                                <MenuItem Header="Delete" />
+                                <MenuItem Header="Delete" Command="{Binding Data.DeleteCommand, Source={StaticResource BindingProxy}}">
+                                    <MenuItem.Icon>
+                                        <Image Source="../../Resources/edit-delete-6.png"/>
+                                    </MenuItem.Icon>
+                                </MenuItem>
                             </ContextMenu>
                         </TextBlock.ContextMenu>
                     </TextBlock>
                 </DataTemplate>
             </ListBox.ItemTemplate>
         </ListBox>
-        <Button Content="Edit" Command="{Binding EditCommand}" HorizontalAlignment="Left" Margin="262,37,0,0" VerticalAlignment="Top" Width="35"/>
-        <Button Content="Delete" Command="{Binding DeleteCommand}" HorizontalAlignment="Left" Margin="213,37,0,0" VerticalAlignment="Top" Width="44"/>
-        <Button Content="Add" Command="{Binding AddCommand}" HorizontalAlignment="Left" Margin="302,37,0,0" VerticalAlignment="Top" Width="26"/>
+        <Button Command="{Binding EditCommand}" HorizontalAlignment="Left" Margin="292,34,0,0" VerticalAlignment="Top" Width="61" Height="23">
+            <StackPanel Orientation="Horizontal">
+                <Image Source="../../Resources/edit-4.png"/>
+                <TextBlock Text="Edit" VerticalAlignment="Center" HorizontalAlignment="Right"/>
+            </StackPanel>
+        </Button>
+        <Button Command="{Binding DeleteCommand}" HorizontalAlignment="Left" Margin="213,34,0,0" VerticalAlignment="Top" Width="74" Height="23">
+            <StackPanel Orientation="Horizontal">
+                <Image Source="../../Resources/edit-delete-6.png"/>
+                <TextBlock Text="Delete" VerticalAlignment="Center" HorizontalAlignment="Right"/>
+            </StackPanel>
+        </Button>
+        <Button Command="{Binding AddCommand}" HorizontalAlignment="Left" Margin="358,34,0,0" VerticalAlignment="Top" Width="62" Height="23">
+            <StackPanel Orientation="Horizontal">
+                <Image Source="../../Resources/edit-add-4.png"/>
+                <TextBlock Text="Add" VerticalAlignment="Center" HorizontalAlignment="Right"/>
+            </StackPanel>
+        </Button>
     </Grid>
 </Window>

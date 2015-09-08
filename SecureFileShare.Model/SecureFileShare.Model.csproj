@@ -42,7 +42,6 @@
     <Compile Include="Contact.cs" />
     <Compile Include="EncryptedFile.cs" />
     <Compile Include="IDbObject.cs" />
-    <Compile Include="MasterKill.cs" />
     <Compile Include="MasterLogin.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>

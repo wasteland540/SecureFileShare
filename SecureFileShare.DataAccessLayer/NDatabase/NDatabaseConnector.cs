@@ -7,7 +7,6 @@ using SecureFileShare.Model;
 
 namespace SecureFileShare.DataAccessLayer.NDatabase
 {
-    //TODO: logging
     public class NDatabaseConnector : IDataAccessLayer
     {
         private const string DatabaseName = "secureFileShare.db";

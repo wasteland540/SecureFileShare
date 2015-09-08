@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
 using System.Windows.Input;
 using GalaSoft.MvvmLight.Messaging;
@@ -193,8 +192,6 @@ namespace SecureFileShare.App.ViewModels.Contacts
 
         private void Delete(object obj)
         {
-            //TODO: implment for context menu!
-
             _messenger.Send(new DeleteContactRequestMsg());
         }
 

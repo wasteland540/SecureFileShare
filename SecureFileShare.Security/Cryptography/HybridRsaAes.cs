@@ -5,7 +5,6 @@ using log4net;
 
 namespace SecureFileShare.Security.Cryptography
 {
-    //TODO: logging
     public class HybridRsaAes : AbstractSecureCompareBase
     {
         private readonly ILog _logger = LogManager.GetLogger(typeof(HybridRsaAes));
@@ -20,16 +19,21 @@ namespace SecureFileShare.Security.Cryptography
         {
             using (var aes = new AesCryptoServiceProvider())
             {
+                _logger.Info("mode: CBC");
                 aes.Mode = CipherMode.CBC;
+                _logger.Info("padding: PKCS7");
                 aes.Padding = PaddingMode.PKCS7;
 
                 aes.Key = key;
                 aes.IV = iv;
 
+                _logger.Info("create stream");
                 using (var memoryStream = new MemoryStream())
                 {
                     var cryptoStream = new CryptoStream(memoryStream,
                         aes.CreateEncryptor(), CryptoStreamMode.Write);
+
+                    _logger.Info("write data to stream");
                     cryptoStream.Write(dataToEncrypt, 0, dataToEncrypt.Length);
                     cryptoStream.FlushFinalBlock();
 
@@ -43,17 +47,21 @@ namespace SecureFileShare.Security.Cryptography
         {
             using (var aes = new AesCryptoServiceProvider())
             {
+                _logger.Info("mode: CBC");
                 aes.Mode = CipherMode.CBC;
+                _logger.Info("padding: PKCS7");
                 aes.Padding = PaddingMode.PKCS7;
 
                 aes.Key = key;
                 aes.IV = iv;
 
+                _logger.Info("create stream");
                 using (var memoryStream = new MemoryStream())
                 {
                     var cryptoStream = new CryptoStream(memoryStream,
                         aes.CreateDecryptor(), CryptoStreamMode.Write);
 
+                    _logger.Info("write data to stream");
                     cryptoStream.Write(dataToDecrypt, 0, dataToDecrypt.Length);
                     cryptoStream.FlushFinalBlock();
 

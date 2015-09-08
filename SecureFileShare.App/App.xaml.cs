@@ -36,7 +36,6 @@ namespace SecureFileShare.App
 
             //service registrations
             Container.RegisterType<ICryptographyService, CryptographyService>();
-            //Container.RegisterType<IFileWatcherService, FileWatcherService>();
 
             //registraions utils
             //only one instance from messenger can exists! (recipient problems..)
