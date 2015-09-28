@@ -24,9 +24,10 @@
     <UpdatePeriodically>false</UpdatePeriodically>
     <UpdateRequired>false</UpdateRequired>
     <MapFileExtensions>true</MapFileExtensions>
-    <ApplicationRevision>2</ApplicationRevision>
+    <ApplicationRevision>4</ApplicationRevision>
     <ApplicationVersion>1.0.0.%2a</ApplicationVersion>
     <UseApplicationTrust>false</UseApplicationTrust>
+    <CreateDesktopShortcut>true</CreateDesktopShortcut>
     <PublishWizardCompleted>true</PublishWizardCompleted>
     <BootstrapperEnabled>true</BootstrapperEnabled>
   </PropertyGroup>
@@ -325,12 +326,6 @@
     </Content>
   </ItemGroup>
   <ItemGroup>
-    <FileAssociation Include=".key">
-      <Visible>False</Visible>
-      <Description>Public key files by Secure File Share application.</Description>
-      <Progid>HKEY_CLASSES_ROOT</Progid>
-      <DefaultIcon>Resources\keyfile.ico</DefaultIcon>
-    </FileAssociation>
     <FileAssociation Include=".sfs">
       <Visible>False</Visible>
       <Description>Files which are encrypted by Secure File Share application.</Description>

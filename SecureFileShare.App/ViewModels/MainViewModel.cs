@@ -398,8 +398,29 @@ namespace SecureFileShare.App.ViewModels
 
             if (CheckSoureAndTargetPath())
             {
-                _cryptographyService.EncryptFile(_sourceFilepath, _targetFilepath, PublicKey);
-                _messenger.Send(new EncryptionSuccsessMsg());
+                if (string.IsNullOrEmpty(ContactName))
+                {
+                    MasterLogin login = _database.GetAll<MasterLogin>().FirstOrDefault();
+
+                    if (login != null)
+                    {
+                        _logger.Info("encrpyt file for myself");
+
+                        _cryptographyService.EncryptFile(_sourceFilepath, _targetFilepath, login.PublicKey);
+                        _messenger.Send(new EncryptionSuccsessMsg());
+                    }
+                    else
+                    {
+                        _logger.Error("login is null!");
+                    }
+                }
+                else
+                {
+                    _logger.Info("encrpyt file for: " + ContactName);
+
+                    _cryptographyService.EncryptFile(_sourceFilepath, _targetFilepath, PublicKey);
+                    _messenger.Send(new EncryptionSuccsessMsg());
+                }
 
                 //reset inputs
                 SourceFilepath = string.Empty;
