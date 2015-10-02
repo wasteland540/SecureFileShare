@@ -1,5 +1,4 @@
 ﻿using System.Collections.Generic;
-using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Security.Cryptography;
@@ -14,6 +13,7 @@ using SecureFileShare.App.Messages;
 using SecureFileShare.App.Services;
 using SecureFileShare.App.ViewModels.Contacts;
 using SecureFileShare.App.Views.Contacts;
+using SecureFileShare.App.Views.Help;
 using SecureFileShare.App.Views.MyAccount;
 using SecureFileShare.DataAccessLayer;
 using SecureFileShare.Model;
@@ -45,6 +45,8 @@ namespace SecureFileShare.App.ViewModels
         private ICommand _openContactsCommand;
         private string _sourceFilepath;
         private string _targetFilepath;
+        private ICommand _openHelpCommand;
+        private HelpView _helpView;
 
         public MainViewModel(ICryptographyService cryptographyService, IMessenger messenger, IDataAccessLayer database)
         {
@@ -203,6 +205,15 @@ namespace SecureFileShare.App.ViewModels
             }
         }
 
+        public ICommand OpenHelpCommand
+        {
+            get
+            {
+                _openHelpCommand = _openHelpCommand ?? new DelegateCommand(OpenHelp);
+                return _openHelpCommand;
+            }
+        }
+
         #endregion Properties
 
         #region Private Methods
@@ -291,6 +302,24 @@ namespace SecureFileShare.App.ViewModels
             }
         }
 
+        private void OpenHelp(object obj)
+        {
+            if (_helpView == null)
+            {
+                _logger.Info("show help view");
+                _helpView = Container.Resolve<HelpView>();
+                _helpView.Closed += delegate { _helpView = null; };
+                _helpView.Show();
+            }
+            else
+            {
+                _logger.Warn("help view already open");
+                _logger.Info("push view in foreground");
+
+                _helpView.Focus();
+            }
+        }
+        
         private void ChangePassword(object obj)
         {
             _logger.Info("show change password view");
@@ -574,14 +603,7 @@ namespace SecureFileShare.App.ViewModels
             {
                 var dir = Path.GetDirectoryName(_targetFilepath);
 
-                if (!string.IsNullOrEmpty(dir))
-                {
-                    isVaild = Directory.Exists(dir);
-                }
-                else
-                {
-                    isVaild = false;
-                }
+                isVaild = !string.IsNullOrEmpty(dir) && Directory.Exists(dir);
             }
 
             return isVaild;

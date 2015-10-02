@@ -1,0 +1,9 @@
+﻿<Window x:Class="SecureFileShare.App.Views.Help.HelpView"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Title="Help" Height="29.7cm" Width="23cm"
+        Icon="../../Resources/secureFileShare.ico">
+    <Grid>
+        <DocumentViewer HorizontalAlignment="Left" VerticalAlignment="Top" Document="{Binding Document}"/>
+    </Grid>
+</Window>

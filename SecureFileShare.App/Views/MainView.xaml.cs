@@ -77,7 +77,7 @@ namespace SecureFileShare.App.Views
         private void OnAssignNewKeysRequestMsg(AssignNewKeysRequestMsg msg)
         {
             MessageBoxResult result = MessageBox.Show(
-                "Are you sure, you want a new key pari?\nYou have to inform your friend and have to send them your new public key file.",
+                "Are you sure, you want a new key pair?\nYou have to inform your friends and have to send them your new public key file.",
                 "Security Check", MessageBoxButton.YesNo, MessageBoxImage.Question);
 
             if (result == MessageBoxResult.Yes)
