@@ -1,4 +1,5 @@
-﻿using System.Windows;
+﻿using System;
+using System.Windows;
 using GalaSoft.MvvmLight.Messaging;
 using log4net;
 using log4net.Config;
@@ -29,7 +30,10 @@ namespace SecureFileShare.App
             Container = new UnityContainer();
 
             _logger.Info("setup database");
-            _dbContext = new NDatabaseConnector();
+            string directory = Environment.GetFolderPath(
+                Environment.SpecialFolder.LocalApplicationData);
+            _logger.Info("database directory: " + directory);
+            _dbContext = new NDatabaseConnector(directory);
 
             //database registration
             Container.RegisterInstance(typeof (IDataAccessLayer), _dbContext);

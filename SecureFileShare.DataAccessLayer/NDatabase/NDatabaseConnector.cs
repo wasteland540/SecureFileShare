@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using NDatabase;
 using NDatabase.Api;
@@ -15,6 +16,13 @@ namespace SecureFileShare.DataAccessLayer.NDatabase
         public NDatabaseConnector()
         {
             _odb = OdbFactory.Open(DatabaseName);
+        }
+
+        public NDatabaseConnector(string directory)
+        {
+            string fileName = Path.Combine(directory, DatabaseName);
+
+            _odb = OdbFactory.Open(fileName);
         }
 
         public void Insert<T>(T value) where T : class, IDbObject
