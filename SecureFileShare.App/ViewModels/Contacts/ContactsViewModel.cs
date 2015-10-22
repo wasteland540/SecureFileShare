@@ -163,16 +163,23 @@ namespace SecureFileShare.App.ViewModels.Contacts
         {
             if (_addEditContactView == null)
             {
-                _logger.Info("show add/edit contact view");
-                _addEditContactView = Container.Resolve<AddEditContactView>();
-                _addEditContactView.Show();
+                if (_selectedContact != null)
+                {
+                    _logger.Info("show add/edit contact view");
+                    _addEditContactView = Container.Resolve<AddEditContactView>();
+                    _addEditContactView.Show();
 
-                var viewmodel = (AddEditContactViewModel) _addEditContactView.DataContext;
-                viewmodel.OriginalName = _selectedContact.Name;
-                viewmodel.Name = _selectedContact.Name;
-                viewmodel.PublicKey = _selectedContact.PublicKey;
-                viewmodel.KeyFilePath = "No new key file selected, but there is still a key for this contact!";
-                viewmodel.IsNew = false;
+                    var viewmodel = (AddEditContactViewModel) _addEditContactView.DataContext;
+                    viewmodel.OriginalName = _selectedContact.Name;
+                    viewmodel.Name = _selectedContact.Name;
+                    viewmodel.PublicKey = _selectedContact.PublicKey;
+                    viewmodel.KeyFilePath = "No new key file selected, but there is still a key for this contact!";
+                    viewmodel.IsNew = false;
+                }
+                else
+                {
+                    _logger.Warn("no contact selected! can not open add/edit contact view");
+                }
             }
             else
             {
@@ -192,7 +199,14 @@ namespace SecureFileShare.App.ViewModels.Contacts
 
         private void Delete(object obj)
         {
-            _messenger.Send(new DeleteContactRequestMsg());
+            if (_selectedContact != null)
+            {
+                _messenger.Send(new DeleteContactRequestMsg());
+            }
+            else
+            {
+                _logger.Warn("no contact selected! do not send 'DeleteContactRequestMsg'");
+            }
         }
 
         private void ContactDoubleClick(object obj)
