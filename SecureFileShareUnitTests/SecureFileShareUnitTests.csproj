@@ -50,6 +50,7 @@
     </Otherwise>
   </Choose>
   <ItemGroup>
+    <Compile Include="App\Services\CryptographyServiceUnitTest.cs" />
     <Compile Include="DataAccessLayer\NDatabaseConnectorUnitTest.cs" />
     <Compile Include="Security\Cryptography\HybridRsaAesUnitTest.cs" />
     <Compile Include="Security\Cryptography\PBKDF2ImplUnitTest.cs" />
@@ -78,9 +79,7 @@
       <Name>SecureFileShare.Util</Name>
     </ProjectReference>
   </ItemGroup>
-  <ItemGroup>
-    <Folder Include="App\" />
-  </ItemGroup>
+  <ItemGroup />
   <ItemGroup>
     <None Include="app.config" />
   </ItemGroup>
