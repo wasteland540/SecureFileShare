@@ -1,4 +1,5 @@
-﻿using System.Windows;
+﻿using System;
+using System.Windows;
 using GalaSoft.MvvmLight.Messaging;
 using Microsoft.Practices.Unity;
 using SecureFileShare.App.Messages;
@@ -12,11 +13,14 @@ namespace SecureFileShare.App.Views.MyAccount
     /// </summary>
     public partial class ChangePasswordView : ICloseable
     {
+        private readonly IMessenger _messenger;
+
         public ChangePasswordView(IMessenger messenger)
         {
             InitializeComponent();
 
-            messenger.Register<PasswordChangeMsg>(this, OnPasswordChangeMsgMessage);
+            _messenger = messenger;
+            _messenger.Register<PasswordChangeMsg>(this, OnPasswordChangeMsgMessage);
         }
 
         [Dependency]
@@ -25,9 +29,24 @@ namespace SecureFileShare.App.Views.MyAccount
             set { DataContext = value; }
         }
 
+        protected override void OnClosed(EventArgs e)
+        {
+            base.OnClosed(e);
+
+            //unregister messages
+            _messenger.Unregister<PasswordChangeMsg>(this, OnPasswordChangeMsgMessage);
+
+            //send close msg
+            _messenger.Send(new AddEditContactViewClosedMsg());
+        }
+
+        #region Private Methods
+
         private void OnPasswordChangeMsgMessage(PasswordChangeMsg passwordChangeMsg)
         {
             MessageBox.Show("Your changes are saved!", "Information", MessageBoxButton.OK, MessageBoxImage.Information);
         }
+
+        #endregion Private Methods
     }
 }

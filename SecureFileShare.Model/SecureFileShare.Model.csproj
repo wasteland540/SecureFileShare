@@ -40,6 +40,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Contact.cs" />
+    <Compile Include="DropboxAccess.cs" />
     <Compile Include="EncryptedFile.cs" />
     <Compile Include="IDbObject.cs" />
     <Compile Include="MasterLogin.cs" />

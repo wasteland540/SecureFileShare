@@ -2,7 +2,7 @@
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:dragDrop="clr-namespace:GongSolutions.Wpf.DragDrop;assembly=GongSolutions.Wpf.DragDrop"
-        Title="Secure File Share" Height="350" Width="525" MinHeight="350" MinWidth="525"
+        Title="Secure File Share" Height="376" Width="553" MinHeight="376" MinWidth="525"
         Icon="../Resources/secureFileShare.ico">
     <Grid>
         <Menu HorizontalAlignment="Stretch" Height="24" VerticalAlignment="Top">
@@ -20,7 +20,7 @@
                 <MenuItem.Icon>
                     <Image Source="../Resources/book-2.png"/>
                 </MenuItem.Icon>
-                <MenuItem Header="Open" Command="{Binding OpenContactsCommand}">
+                <MenuItem Header="Open..." Command="{Binding OpenContactsCommand}">
                     <MenuItem.Icon>
                         <Image Source="../Resources/book-go.png"/>
                     </MenuItem.Icon>
@@ -30,7 +30,7 @@
                 <MenuItem.Icon>
                     <Image Source="../Resources/identity-2.png"/>
                 </MenuItem.Icon>
-                <MenuItem Header="Change Password" Command="{Binding ChangePasswordCommand}">
+                <MenuItem Header="Change Password..." Command="{Binding ChangePasswordCommand}">
                     <MenuItem.Icon>
                         <Image Source="../Resources/kgpg.png"/>
                     </MenuItem.Icon>
@@ -41,9 +41,15 @@
                         <Image Source="../Resources/kgpg_gen.png"/>
                     </MenuItem.Icon>
                 </MenuItem>
-                <MenuItem Header="Export my public key" Command="{Binding ExportPublicKeyCommand}">
+                <MenuItem Header="Export my public key..." Command="{Binding ExportPublicKeyCommand}">
                     <MenuItem.Icon>
                         <Image Source="../Resources/kgpg_export.png"/>
+                    </MenuItem.Icon>
+                </MenuItem>
+                <Separator />
+                <MenuItem Header="Connect Dropbox..." Command="{Binding ConnectDropboxCommand}">
+                    <MenuItem.Icon>
+                        <Image Source="../Resources/dropbox.png"/>
                     </MenuItem.Icon>
                 </MenuItem>
             </MenuItem>
@@ -58,13 +64,13 @@
                 </MenuItem>
             </MenuItem>
         </Menu>
-        <Rectangle dragDrop:DragDrop.IsDropTarget="True" dragDrop:DragDrop.DropHandler="{Binding}"  Fill="#FFF4F4F5" HorizontalAlignment="Stretch" Margin="10,136,10,35" Stroke="Black" VerticalAlignment="Stretch" />
-        <Image dragDrop:DragDrop.IsDropTarget="True" dragDrop:DragDrop.DropHandler="{Binding}" Source="../Resources/drop area.png" Margin="61,136,64,35"/>
-        <TextBox Text="{Binding SourceFilepath}" HorizontalAlignment="Stretch" Height="23" Margin="70,30,112,0" TextWrapping="Wrap" VerticalAlignment="Top" />
-        <Button Content="Choose file..." Command="{Binding ChooseSourceCommand}" HorizontalAlignment="Right" Margin="0,29,10,0" VerticalAlignment="Top" Width="97" Height="24"/>
+        <Rectangle dragDrop:DragDrop.IsDropTarget="True" dragDrop:DragDrop.DropHandler="{Binding}"  Fill="#FFF4F4F5" HorizontalAlignment="Stretch" Margin="10,136,10,54" Stroke="Black" VerticalAlignment="Stretch" />
+        <Image dragDrop:DragDrop.IsDropTarget="True" dragDrop:DragDrop.DropHandler="{Binding}" Source="../Resources/drop area.png" Margin="61,136,64,54"/>
+        <TextBox Text="{Binding SourceFilepath}" HorizontalAlignment="Stretch" Height="23" Margin="70,30,143,0" TextWrapping="Wrap" VerticalAlignment="Top" />
+        <Button Content="Choose file..." Command="{Binding ChooseSourceCommand}" HorizontalAlignment="Right" Margin="0,29,41,0" VerticalAlignment="Top" Width="97" Height="24"/>
         <Label Content="Target:" HorizontalAlignment="Left" Margin="10,58,0,0" VerticalAlignment="Top"/>
-        <TextBox Text="{Binding TargetFilepath}" HorizontalAlignment="Stretch" Height="23" Margin="70,61,112,0" TextWrapping="Wrap" VerticalAlignment="Top" />
-        <Button Content="Choose file..." Command="{Binding ChooseTargetCommand}" HorizontalAlignment="Right" Margin="0,61,10,0" VerticalAlignment="Top" Width="97" Height="24"/>
+        <TextBox Text="{Binding TargetFilepath}" HorizontalAlignment="Stretch" Height="23" Margin="70,61,143,0" TextWrapping="Wrap" VerticalAlignment="Top" />
+        <Button Content="Choose file..." Command="{Binding ChooseTargetCommand}" HorizontalAlignment="Right" Margin="0,61,41,0" VerticalAlignment="Top" Width="97" Height="24"/>
         <Label Content="Source:" HorizontalAlignment="Left" Margin="10,27,0,0" VerticalAlignment="Top"/>
         <Button Command="{Binding EncryptCommand}" IsEnabled="{Binding DisableForEncryption}" HorizontalAlignment="Right" Margin="0,0,10,7" VerticalAlignment="Bottom" Width="75" Height="23">
             <StackPanel Orientation="Horizontal">
@@ -79,11 +85,17 @@
             </StackPanel>
         </Button>
         <Label Content="Receipient (Only for encryption needed!):" HorizontalAlignment="Left" Margin="10,89,0,0" VerticalAlignment="Top"/>
-        <TextBox IsReadOnly="True" Text="{Binding ContactName}" IsEnabled="{Binding DisableForEncryption}" HorizontalAlignment="Stretch" Height="23" Margin="242,92,112,0" TextWrapping="Wrap" VerticalAlignment="Top"/>
-        <Button Command="{Binding ChooseContactCommand}" IsEnabled="{Binding DisableForEncryption}" HorizontalAlignment="Right" Margin="0,92,10,0" VerticalAlignment="Top" Width="97" Height="23">
+        <TextBox IsReadOnly="True" Text="{Binding ContactName}" IsEnabled="{Binding DisableForEncryption}" HorizontalAlignment="Stretch" Height="23" Margin="242,92,143,0" TextWrapping="Wrap" VerticalAlignment="Top"/>
+        <Button Command="{Binding ChooseContactCommand}" IsEnabled="{Binding DisableForEncryption}" HorizontalAlignment="Right" Margin="0,92,41,0" VerticalAlignment="Top" Width="97" Height="23">
             <StackPanel Orientation="Horizontal">
                 <Image Source="../Resources/book-go.png"/>
                 <TextBlock Text="Choose..." VerticalAlignment="Center" HorizontalAlignment="Right"/>
+            </StackPanel>
+        </Button>
+        <CheckBox Content="Upload to Dropbox" HorizontalAlignment="Right" Margin="0,0,10,30" VerticalAlignment="Bottom" Width="125" Height="19" IsEnabled="{Binding HasAccessToDropbox}" IsChecked="{Binding UploadToDropboxChecked}"/>
+        <Button HorizontalAlignment="Right" Margin="0,29,10,0" VerticalAlignment="Top" Width="26" Height="24" Background="White" Command="{Binding ShowDropboxFilesCommand}" IsEnabled="{Binding HasAccessToDropbox}">
+            <StackPanel Orientation="Horizontal">
+                <Image Source="../Resources/dropbox.png"/>
             </StackPanel>
         </Button>
     </Grid>

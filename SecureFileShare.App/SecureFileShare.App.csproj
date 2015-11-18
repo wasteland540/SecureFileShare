@@ -26,7 +26,7 @@
     <MapFileExtensions>true</MapFileExtensions>
     <ProductName>SecureFileShare</ProductName>
     <PublisherName>Marcel Elz</PublisherName>
-    <ApplicationRevision>14</ApplicationRevision>
+    <ApplicationRevision>17</ApplicationRevision>
     <ApplicationVersion>1.0.0.%2a</ApplicationVersion>
     <UseApplicationTrust>true</UseApplicationTrust>
     <CreateDesktopShortcut>true</CreateDesktopShortcut>
@@ -132,28 +132,43 @@
     <Compile Include="Messages\ChooseTargetConfirmMsg.cs" />
     <Compile Include="Messages\ChooseTargetRequestMsg.cs" />
     <Compile Include="Messages\CloseContactsViewMsg.cs" />
+    <Compile Include="Messages\ConnectDropboxViewClosedMsg.cs" />
     <Compile Include="Messages\ContactSelectedMsg.cs" />
     <Compile Include="Messages\ContactsViewClosedMsg.cs" />
     <Compile Include="Messages\DecryptionFailedMsg.cs" />
     <Compile Include="Messages\DecryptionSuccsessMsg.cs" />
     <Compile Include="Messages\DeleteContactConfirmMsg.cs" />
     <Compile Include="Messages\DeleteContactRequestMsg.cs" />
+    <Compile Include="Messages\DropboxAccessTokenEmptyMsg.cs" />
+    <Compile Include="Messages\DropboxAccessTokenSavedMsg.cs" />
+    <Compile Include="Messages\DropboxAPIAccessFaildMsg.cs" />
+    <Compile Include="Messages\DropboxFileDownloadFinishedMsg.cs" />
+    <Compile Include="Messages\DropboxProcessCodeFlowErrorMsg.cs" />
     <Compile Include="Messages\EncryptionSuccsessMsg.cs" />
     <Compile Include="Messages\ExportPublicKeyConfirmMsg.cs" />
     <Compile Include="Messages\ExportPublicKeyFailedMsg.cs" />
     <Compile Include="Messages\ExportPublicKeyRequestMsg.cs" />
     <Compile Include="Messages\ExportPublicKeySuccsessMsg.cs" />
+    <Compile Include="Messages\FileListCancelMsg.cs" />
+    <Compile Include="Messages\FileListViewClosedMsg.cs" />
     <Compile Include="Messages\FileSizeNotSupportedMsg.cs" />
     <Compile Include="Messages\ImportPublicKeyFileFailedMsg.cs" />
     <Compile Include="Messages\ImportPublicKeyFileSuccuessMsg.cs" />
     <Compile Include="Messages\PasswordChangeMsg.cs" />
     <Compile Include="Messages\SaveContactMsg.cs" />
+    <Compile Include="Messages\SelectedFileIsNullOrEmptyMsg.cs" />
     <Compile Include="Messages\SourceTargetInvaildMsg.cs" />
+    <Compile Include="Messages\StartUploadToDropboxMsg.cs" />
+    <Compile Include="Messages\UploadToDropboxSuccessfulMsg.cs" />
+    <Compile Include="Services\DropboxService.cs" />
+    <Compile Include="Services\IDropboxService.cs" />
     <Compile Include="Services\UIServices.cs" />
     <Compile Include="ViewModels\Contacts\AddEditContactViewModel.cs" />
     <Compile Include="ViewModels\Contacts\ContactsViewModel.cs" />
     <Compile Include="ViewModels\Help\HelpViewModel.cs" />
     <Compile Include="ViewModels\MyAccount\ChangePasswordViewModel.cs" />
+    <Compile Include="ViewModels\MyAccount\ConnectDropboxViewModel.cs" />
+    <Compile Include="ViewModels\Util\FileListViewModel.cs" />
     <Compile Include="Views\BindingProxy\BindingProxy.cs" />
     <Compile Include="Views\Contacts\AddEditContactView.xaml.cs">
       <DependentUpon>AddEditContactView.xaml</DependentUpon>
@@ -166,6 +181,12 @@
     </Compile>
     <Compile Include="Views\MyAccount\ChangePasswordView.xaml.cs">
       <DependentUpon>ChangePasswordView.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Views\MyAccount\ConnectDropboxView.xaml.cs">
+      <DependentUpon>ConnectDropboxView.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Views\Util\FileListView.xaml.cs">
+      <DependentUpon>FileListView.xaml</DependentUpon>
     </Compile>
     <Page Include="Views\Contacts\AddEditContactView.xaml">
       <SubType>Designer</SubType>
@@ -210,6 +231,14 @@
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
+    <Page Include="Views\MyAccount\ConnectDropboxView.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Views\Util\FileListView.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Properties\AssemblyInfo.cs">
@@ -225,6 +254,7 @@
       <DependentUpon>Settings.settings</DependentUpon>
       <DesignTimeSharedInput>True</DesignTimeSharedInput>
     </Compile>
+    <Resource Include="Resources\world-go.png" />
     <EmbeddedResource Include="Properties\Resources.resx">
       <Generator>ResXFileCodeGenerator</Generator>
       <LastGenOutput>Resources.Designer.cs</LastGenOutput>
@@ -241,7 +271,9 @@
     <None Include="SecureFileShare.App_TemporaryKey.pfx" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="App.config" />
+    <None Include="App.config">
+      <SubType>Designer</SubType>
+    </None>
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\SecureFileShare.DataAccessLayer\SecureFileShare.DataAccessLayer.csproj">
@@ -336,6 +368,7 @@
     <Resource Include="Resources\secureFileShare.png" />
   </ItemGroup>
   <ItemGroup>
+    <Resource Include="Resources\dropbox.png" />
     <Content Include="Resources\secureFileShare.ico">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>

@@ -12,9 +12,11 @@ using SecureFileShare.App.Commands;
 using SecureFileShare.App.Messages;
 using SecureFileShare.App.Services;
 using SecureFileShare.App.ViewModels.Contacts;
+using SecureFileShare.App.ViewModels.Util;
 using SecureFileShare.App.Views.Contacts;
 using SecureFileShare.App.Views.Help;
 using SecureFileShare.App.Views.MyAccount;
+using SecureFileShare.App.Views.Util;
 using SecureFileShare.DataAccessLayer;
 using SecureFileShare.Model;
 using SecureFileShare.Util.FileIO;
@@ -26,6 +28,7 @@ namespace SecureFileShare.App.ViewModels
         private const string SecureFileShareExtension = ".sfs";
         private readonly ICryptographyService _cryptographyService;
         private readonly IDataAccessLayer _database;
+        private readonly IDropboxService _dropboxService;
         private readonly ILog _logger = LogManager.GetLogger(typeof (MainViewModel));
         private readonly IMessenger _messenger;
 
@@ -34,6 +37,8 @@ namespace SecureFileShare.App.ViewModels
         private ICommand _chooseContactCommand;
         private ICommand _chooseSourceCommand;
         private ICommand _chooseTargetCommand;
+        private ICommand _connectDropboxCommand;
+        private ConnectDropboxView _connectDropboxView;
         private string _contactName;
         private ContactsView _contactsView;
         private ICommand _decryptCommand;
@@ -41,18 +46,24 @@ namespace SecureFileShare.App.ViewModels
         private ICommand _encryptCommand;
         private ICommand _exitCommand;
         private ICommand _exportPublicKeyCommand;
+        private FileListView _fileListView;
+        private bool _hasAccessToDropbox;
+        private HelpView _helpView;
         private bool _isProcessInProgress;
         private ICommand _openContactsCommand;
+        private ICommand _openHelpCommand;
+        private ICommand _showDropboxFilesCommand;
         private string _sourceFilepath;
         private string _targetFilepath;
-        private ICommand _openHelpCommand;
-        private HelpView _helpView;
+        private bool _uploadToDropboxChecked;
 
-        public MainViewModel(ICryptographyService cryptographyService, IMessenger messenger, IDataAccessLayer database)
+        public MainViewModel(ICryptographyService cryptographyService, IMessenger messenger, IDataAccessLayer database,
+            IDropboxService dropboxService)
         {
             _cryptographyService = cryptographyService;
             _messenger = messenger;
             _database = database;
+            _dropboxService = dropboxService;
 
             //register for messages
             _messenger.Register<AssignNewKeysConfirmMsg>(this, OnAssignNewKeysConfirmMsg);
@@ -61,6 +72,14 @@ namespace SecureFileShare.App.ViewModels
             _messenger.Register<ChooseSourceConfirmMsg>(this, OnChooseSourceConfirmMsg);
             _messenger.Register<ChooseTargetConfirmMsg>(this, OnChooseTargetConfirmMsg);
             _messenger.Register<ContactSelectedMsg>(this, OnContactSelectedMsg);
+            _messenger.Register<ConnectDropboxViewClosedMsg>(this, OnConnectDropboxViewClosedMsg);
+            _messenger.Register<DropboxAccessTokenSavedMsg>(this, OnDropboxAccessTokenSavedMsg);
+            _messenger.Register<FileListViewClosedMsg>(this, OnFileListViewClosedMsg);
+            _messenger.Register<DropboxFileDownloadFinishedMsg>(this, OnDropboxFileDownloadFinishedMsg);
+
+            _messenger.Register<EncryptionSuccsessMsg>(this, OnEncryptionSuccsessMsg);
+
+            CheckDropboxAccess();
         }
 
         #region Properties
@@ -107,6 +126,24 @@ namespace SecureFileShare.App.ViewModels
             {
                 _exportPublicKeyCommand = _exportPublicKeyCommand ?? new DelegateCommand(ExportPublicKey);
                 return _exportPublicKeyCommand;
+            }
+        }
+
+        public ICommand ConnectDropboxCommand
+        {
+            get
+            {
+                _connectDropboxCommand = _connectDropboxCommand ?? new DelegateCommand(OpenConnectDropboxView);
+                return _connectDropboxCommand;
+            }
+        }
+
+        public ICommand ShowDropboxFilesCommand
+        {
+            get
+            {
+                _showDropboxFilesCommand = _showDropboxFilesCommand ?? new DelegateCommand(ShowDropboxFilesView);
+                return _showDropboxFilesCommand;
             }
         }
 
@@ -211,6 +248,26 @@ namespace SecureFileShare.App.ViewModels
             {
                 _openHelpCommand = _openHelpCommand ?? new DelegateCommand(OpenHelp);
                 return _openHelpCommand;
+            }
+        }
+
+        public bool HasAccessToDropbox
+        {
+            get { return _hasAccessToDropbox; }
+            set
+            {
+                _hasAccessToDropbox = value;
+                RaisePropertyChanged("HasAccessToDropbox");
+            }
+        }
+
+        public bool UploadToDropboxChecked
+        {
+            get { return _uploadToDropboxChecked; }
+            set
+            {
+                _uploadToDropboxChecked = value;
+                RaisePropertyChanged("UploadToDropboxChecked");
             }
         }
 
@@ -319,7 +376,7 @@ namespace SecureFileShare.App.ViewModels
                 _helpView.Focus();
             }
         }
-        
+
         private void ChangePassword(object obj)
         {
             _logger.Info("show change password view");
@@ -436,7 +493,7 @@ namespace SecureFileShare.App.ViewModels
                         _logger.Info("encrpyt file for myself");
 
                         _cryptographyService.EncryptFile(_sourceFilepath, _targetFilepath, login.PublicKey);
-                        _messenger.Send(new EncryptionSuccsessMsg());
+                        _messenger.Send(new EncryptionSuccsessMsg {TargetPath = _targetFilepath + ".sfs"});
                     }
                     else
                     {
@@ -448,8 +505,11 @@ namespace SecureFileShare.App.ViewModels
                     _logger.Info("encrpyt file for: " + ContactName);
 
                     _cryptographyService.EncryptFile(_sourceFilepath, _targetFilepath, PublicKey);
-                    _messenger.Send(new EncryptionSuccsessMsg());
+                    _messenger.Send(new EncryptionSuccsessMsg {TargetPath = _targetFilepath});
                 }
+
+                _logger.Info("check if source file in temp directory and when it is, then delete");
+                CheckSourceFileInTempDirectory();
 
                 //reset inputs
                 SourceFilepath = string.Empty;
@@ -496,6 +556,9 @@ namespace SecureFileShare.App.ViewModels
                             _logger.Error("file can not decrypt!");
                             _messenger.Send(new DecryptionFailedMsg());
                         }
+
+                        _logger.Info("check if source file in temp directory and when it is, then delete");
+                        CheckSourceFileInTempDirectory();
 
                         //reset inputs
                         SourceFilepath = string.Empty;
@@ -601,12 +664,134 @@ namespace SecureFileShare.App.ViewModels
 
             if (isVaild)
             {
-                var dir = Path.GetDirectoryName(_targetFilepath);
+                string dir = Path.GetDirectoryName(_targetFilepath);
 
                 isVaild = !string.IsNullOrEmpty(dir) && Directory.Exists(dir);
             }
 
             return isVaild;
+        }
+
+        private void OpenConnectDropboxView(object obj)
+        {
+            if (_connectDropboxView == null)
+            {
+                _logger.Info("show connect dropbox view");
+                _connectDropboxView = Container.Resolve<ConnectDropboxView>();
+                _connectDropboxView.Show();
+            }
+            else
+            {
+                _logger.Warn("connect dropbox view already open");
+                _logger.Info("push view in foreground");
+
+                _connectDropboxView.Focus();
+            }
+        }
+
+        private void OnConnectDropboxViewClosedMsg(ConnectDropboxViewClosedMsg msg)
+        {
+            _logger.Info("set connect dropbox view to null");
+            _connectDropboxView = null;
+        }
+
+        private void CheckDropboxAccess()
+        {
+            var dropboxAccess = _database.GetSingleByName<DropboxAccess>(DropboxAccess.ObjectName);
+
+            if (dropboxAccess != null)
+            {
+                HasAccessToDropbox = true;
+            }
+        }
+
+        private void OnDropboxAccessTokenSavedMsg(DropboxAccessTokenSavedMsg msg)
+        {
+            CheckDropboxAccess();
+        }
+
+        private void OnEncryptionSuccsessMsg(EncryptionSuccsessMsg msg)
+        {
+            if (_uploadToDropboxChecked)
+            {
+                _logger.Info("upload to Dropbox checked");
+
+                _logger.Info("get dropbox access from database");
+                var dropboxAccess = _database.GetSingleByName<DropboxAccess>(DropboxAccess.ObjectName);
+
+                if (dropboxAccess != null)
+                {
+                    string filename = Path.GetFileName(msg.TargetPath);
+
+                    _logger.Info("read file content in byte array");
+                    byte[] content;
+                    using (FileStream fileStream = File.OpenRead(msg.TargetPath))
+                    {
+                        content = new byte[fileStream.Length];
+
+                        fileStream.Read(content, 0, (int) fileStream.Length);
+                        fileStream.Close();
+                    }
+
+                    _messenger.Send(new StartUploadToDropboxMsg());
+                    _logger.Info(string.Format("start uploading file:{0}", filename));
+
+                    _dropboxService.Upload(dropboxAccess.AccessToken, filename, content, OnUploadSuccess);
+                }
+            }
+        }
+
+        private void OnUploadSuccess()
+        {
+            _messenger.Send(new UploadToDropboxSuccessfulMsg());
+        }
+
+        private void ShowDropboxFilesView(object obj)
+        {
+            if (_fileListView == null)
+            {
+                _logger.Info("show file list view");
+                _fileListView = Container.Resolve<FileListView>();
+                var viewModel = (FileListViewModel) _fileListView.DataContext;
+                viewModel.CloudService = FileListViewModel.CloudServiceType.Dropbox;
+
+                _fileListView.Show();
+            }
+            else
+            {
+                _logger.Warn("file list view already open");
+                _logger.Info("push view in foreground");
+
+                _fileListView.Focus();
+            }
+        }
+
+        private void OnFileListViewClosedMsg(FileListViewClosedMsg msg)
+        {
+            _logger.Info("set file list view to null");
+            _fileListView = null;
+        }
+
+        private void OnDropboxFileDownloadFinishedMsg(DropboxFileDownloadFinishedMsg msg)
+        {
+            _logger.Info("download from dropbox finished");
+            string tmpFilePath = Path.Combine(Path.GetTempPath(), msg.Filename);
+            _logger.Info("write file in temp directory: " + tmpFilePath);
+            File.WriteAllBytes(tmpFilePath, msg.DownloadedFile);
+
+            SourceFilepath = tmpFilePath;
+        }
+
+        private void CheckSourceFileInTempDirectory()
+        {
+            string directory = Path.GetDirectoryName(_sourceFilepath);
+
+            if (directory == Path.GetDirectoryName(Path.GetTempPath()))
+            {
+                _logger.Info("file is in temp directory. delete it!");
+                File.Delete(_sourceFilepath);
+                _logger.Info("file deleted!");
+            }
         }
 
         #endregion Private Methods

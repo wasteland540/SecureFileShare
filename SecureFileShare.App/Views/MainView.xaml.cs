@@ -31,6 +31,8 @@ namespace SecureFileShare.App.Views
             _messenger.Register<DecryptionFailedMsg>(this, OnDecryptionFailedMsg);
             _messenger.Register<FileSizeNotSupportedMsg>(this, OnFileSizeNotSupportedMsg);
             _messenger.Register<SourceTargetInvaildMsg>(this, OnSourceTargetInvaildMsg);
+            _messenger.Register<UploadToDropboxSuccessfulMsg>(this, OnUploadToDropboxSuccessfulMsg);
+            _messenger.Register<StartUploadToDropboxMsg>(this, OnStartUploadToDropboxMsg);
         }
 
         [Dependency]
@@ -110,39 +112,53 @@ namespace SecureFileShare.App.Views
             }
         }
 
-        private void OnDecryptionFailedMsg(DecryptionFailedMsg obj)
+        private void OnDecryptionFailedMsg(DecryptionFailedMsg msg)
         {
             MessageBox.Show(
                 "Something went wrong, please try again and start the application with admin access!", "Failed",
                 MessageBoxButton.OK, MessageBoxImage.Error);
         }
 
-        private void OnDecryptionSuccsessMsg(DecryptionSuccsessMsg obj)
+        private void OnDecryptionSuccsessMsg(DecryptionSuccsessMsg msg)
         {
             MessageBox.Show(
                 "File decrypted!", "Success",
                 MessageBoxButton.OK, MessageBoxImage.Asterisk);
         }
 
-        private void OnEncryptionSuccsessMsg(EncryptionSuccsessMsg obj)
+        private void OnEncryptionSuccsessMsg(EncryptionSuccsessMsg msg)
         {
             MessageBox.Show(
                 "File encrypted!", "Success",
                 MessageBoxButton.OK, MessageBoxImage.Asterisk);
         }
 
-        private void OnFileSizeNotSupportedMsg(FileSizeNotSupportedMsg obj)
+        private void OnFileSizeNotSupportedMsg(FileSizeNotSupportedMsg msg)
         {
             MessageBox.Show(
                "You can only en-/decrypt files with a size less or equal 100MB!", "File size not supported",
                MessageBoxButton.OK, MessageBoxImage.Warning);
         }
 
-        private void OnSourceTargetInvaildMsg(SourceTargetInvaildMsg obj)
+        private void OnSourceTargetInvaildMsg(SourceTargetInvaildMsg msg)
         {
             MessageBox.Show(
-                "Pleas check the source and target path!", "Failed",
+                "Please check the source and target path!", "Failed",
                 MessageBoxButton.OK, MessageBoxImage.Error);
+        }
+
+        private void OnUploadToDropboxSuccessfulMsg(UploadToDropboxSuccessfulMsg msg)
+        {
+            MessageBox.Show(
+                "Uploading to Dropbox completed.", "Uploading completed",
+                MessageBoxButton.OK, MessageBoxImage.Information);
+        }
+
+        private void OnStartUploadToDropboxMsg(StartUploadToDropboxMsg msg)
+        {
+            MessageBox.Show(
+                "Start uploading to Dropbox.", "Start uploading",
+                MessageBoxButton.OK, MessageBoxImage.Information);
         }
 
         #endregion Private Methods

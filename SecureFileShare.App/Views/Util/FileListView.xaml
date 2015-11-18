@@ -1,0 +1,13 @@
+﻿<Window x:Class="SecureFileShare.App.Views.Util.FileListView"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Title="Filelist" Height="300" Width="300"
+        MinHeight="300" MinWidth="220"
+        Icon="../../Resources/secureFileShare.ico">
+    <Grid>
+        <TextBlock HorizontalAlignment="Stretch" Margin="10,10,10,0" TextWrapping="Wrap" Text="{Binding Hint}" VerticalAlignment="Top" Height="53" />
+        <ListBox ItemsSource="{Binding FileList}" SelectedItem="{Binding SelectedFile}" HorizontalAlignment="Stretch" Margin="10,68,10,35" VerticalAlignment="Stretch"/>
+        <Button Content="Cancel" Command="{Binding CancelCommand}" HorizontalAlignment="Right" Margin="0,0,10,10" VerticalAlignment="Bottom" Width="75"/>
+        <Button Content="Choose" Command="{Binding ChooseCommand}" HorizontalAlignment="Right" Margin="0,0,90,10" VerticalAlignment="Bottom" Width="75"/>
+    </Grid>
+</Window>

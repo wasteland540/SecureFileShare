@@ -1,0 +1,59 @@
+﻿<Window x:Class="SecureFileShare.App.Views.MyAccount.ConnectDropboxView"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Title="Connect Dropbox" Height="390" Width="532" MinHeight="376" MinWidth="525" ResizeMode="NoResize"
+        Icon="../../Resources/secureFileShare.ico">
+    <Grid>
+        <Label Content="Connect your Drobbox in 3 steps." HorizontalAlignment="Left" Margin="10,10,0,0" VerticalAlignment="Top"/>
+        <GroupBox Header="Step 1" HorizontalAlignment="Left" Margin="10,41,0,0" VerticalAlignment="Top" Width="497" Height="119">
+            <Grid>
+                <Label HorizontalAlignment="Left" Margin="10,10,0,0" VerticalAlignment="Top">
+                    <TextBlock>
+                        You have to allow that SecureFileShare get access to a specific app folder in your 
+                        <LineBreak />
+                        Dropbox. Please click on the 'Access Request' button make a access request.
+                        <LineBreak />
+                        This will open a new tab in your default webbrowser.
+                    </TextBlock>
+                </Label>
+                <Button HorizontalAlignment="Left" Margin="366,73,0,0" VerticalAlignment="Top" Width="109" Command="{Binding AccessRequestCommand}">
+                    <StackPanel Orientation="Horizontal">
+                        <Image Source="../../Resources/world-go.png"/>
+                        <TextBlock Text=" Access Request" VerticalAlignment="Center" HorizontalAlignment="Right"/>
+                    </StackPanel>
+                </Button>
+            </Grid>
+        </GroupBox>
+        <GroupBox Header="Step 2" HorizontalAlignment="Left" Margin="10,165,0,0" VerticalAlignment="Top" Width="497" Height="81">
+            <Grid>
+                <Label>
+                    <TextBlock>
+                        In the new tab, you will see a little dialog in which Dropbox asked, if you want to give
+                        <LineBreak/>
+                        <Bold>SecureFileShare</Bold> permission for the 'Apps > SecureFileShare' directory.
+                        <LineBreak/>
+                        Click <Bold>Allow</Bold>, if you want to upload files from this application directly to your Dropbox.
+                    </TextBlock>
+                </Label>
+            </Grid>
+        </GroupBox>
+        <GroupBox Header="Step 3" HorizontalAlignment="Left" Margin="10,251,0,0" VerticalAlignment="Top" Width="497" Height="90">
+            <Grid>
+                <Label>
+                    <TextBlock>
+                       After you click <Bold>Allow</Bold>, you receive a code from Drobbox. Please copy this code and past
+                       <LineBreak />
+                       it in the Textbox below and click <Bold>Save</Bold>:
+                    </TextBlock>
+                </Label>
+                <TextBox HorizontalAlignment="Left" Height="23" Margin="0,41,0,0" TextWrapping="Wrap" Text="{Binding AccessToken}" VerticalAlignment="Top" Width="361"/>
+                <Button HorizontalAlignment="Left" Margin="366,41,0,0" VerticalAlignment="Top" Width="109" Command="{Binding SaveCommand}" Height="22">
+                    <StackPanel Orientation="Horizontal">
+                        <Image Source="../../Resources/document-save-5.png"/>
+                        <TextBlock Text=" Save" VerticalAlignment="Center" HorizontalAlignment="Right"/>
+                    </StackPanel>
+                </Button>
+            </Grid>
+        </GroupBox>
+    </Grid>
+</Window>
