@@ -12,7 +12,7 @@ namespace SecureFileShare.Security.APIs
     {
         private readonly byte[] ecode =
         {
-            00,
+            00
         };
 
         public object NewClass(byte[] key, string classname)

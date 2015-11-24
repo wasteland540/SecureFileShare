@@ -94,12 +94,12 @@ namespace SecureFileShare.App.Services
                 _appKey =
                     (string)
                         secretClassBuilder.CallMethod(
-                            new byte[] {00},
+                            new byte[] { 00 },
                             " SecureFileShare.Secrets.DropboxApi", "GetKey", new object[0]);
                 _appSecret =
                     (string)
                         secretClassBuilder.CallMethod(
-                            new byte[] {00},
+                            new byte[] { 00 },
                             " SecureFileShare.Secrets.DropboxApi", "GetSecret", new object[0]);
 
                 _logger.Info("api access loaded");
