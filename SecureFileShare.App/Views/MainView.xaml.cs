@@ -33,6 +33,8 @@ namespace SecureFileShare.App.Views
             _messenger.Register<SourceTargetInvaildMsg>(this, OnSourceTargetInvaildMsg);
             _messenger.Register<UploadToDropboxSuccessfulMsg>(this, OnUploadToDropboxSuccessfulMsg);
             _messenger.Register<StartUploadToDropboxMsg>(this, OnStartUploadToDropboxMsg);
+            _messenger.Register<ZipFilesStartMsg>(this, OnZipFilesStartMsg);
+            _messenger.Register<NoDirectorySupportedMsg>(this, OnNoDirectorySupportedMsg);
         }
 
         [Dependency]
@@ -102,13 +104,13 @@ namespace SecureFileShare.App.Views
 
         private void OnChooseSourceRequestMsg(ChooseSourceRequestMsg msg)
         {
-            var openFileDialog = new OpenFileDialog();
+            var openFileDialog = new OpenFileDialog {Multiselect = true};
             bool? dialogResult = openFileDialog.ShowDialog();
 
             if (dialogResult != null && dialogResult.Value)
             {
-                string filename = openFileDialog.FileName;
-                _messenger.Send(new ChooseSourceConfirmMsg(filename));
+                string[] filenames = openFileDialog.FileNames;
+                _messenger.Send(new ChooseSourceConfirmMsg(filenames));
             }
         }
 
@@ -136,8 +138,8 @@ namespace SecureFileShare.App.Views
         private void OnFileSizeNotSupportedMsg(FileSizeNotSupportedMsg msg)
         {
             MessageBox.Show(
-               "You can only en-/decrypt files with a size less or equal 100MB!", "File size not supported",
-               MessageBoxButton.OK, MessageBoxImage.Warning);
+                "You can only en-/decrypt files with a size less or equal 100MB!", "File size not supported",
+                MessageBoxButton.OK, MessageBoxImage.Warning);
         }
 
         private void OnSourceTargetInvaildMsg(SourceTargetInvaildMsg msg)
@@ -159,6 +161,20 @@ namespace SecureFileShare.App.Views
             MessageBox.Show(
                 "Start uploading to Dropbox.", "Start uploading",
                 MessageBoxButton.OK, MessageBoxImage.Information);
+        }
+
+        private void OnZipFilesStartMsg(ZipFilesStartMsg msg)
+        {
+            MessageBox.Show(
+                "We will zip your selected files now, this can take some moments.", "Zipping Files",
+                MessageBoxButton.OK, MessageBoxImage.Information);
+        }
+
+        private void OnNoDirectorySupportedMsg(NoDirectorySupportedMsg msg)
+        {
+            MessageBox.Show(
+                "You can only encrypt multiple file, but no directories!", "Directory not supported",
+                MessageBoxButton.OK, MessageBoxImage.Warning);
         }
 
         #endregion Private Methods

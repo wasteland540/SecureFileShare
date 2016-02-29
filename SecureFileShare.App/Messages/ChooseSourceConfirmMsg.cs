@@ -2,11 +2,11 @@
 {
     public class ChooseSourceConfirmMsg
     {
-        public ChooseSourceConfirmMsg(string filename)
+        public ChooseSourceConfirmMsg(string[] filenames)
         {
-            Filename = filename;
+            Filenames = filenames;
         }
 
-        public string Filename { get; private set; }
+        public string[] Filenames { get; private set; }
     }
 }

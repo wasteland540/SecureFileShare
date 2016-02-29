@@ -204,7 +204,7 @@ namespace SecureFileShare.App.Services
                     string fileExtension = Encoding.UTF8.GetString(decryptedFileExtension);
 
                     _logger.Info("write decrypted data to file");
-                    WriteDataToFile(decryptedData, destinationFilename + "." + fileExtension);
+                    WriteDataToFile(decryptedData, destinationFilename + fileExtension);
                 }
                 else
                 {

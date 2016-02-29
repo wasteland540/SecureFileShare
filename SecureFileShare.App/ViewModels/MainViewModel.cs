@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.IO;
+using System.IO.Compression;
 using System.Linq;
 using System.Security.Cryptography;
 using System.Windows;
@@ -26,6 +27,7 @@ namespace SecureFileShare.App.ViewModels
     public class MainViewModel : ViewModelBase, IDropTarget
     {
         private const string SecureFileShareExtension = ".sfs";
+        private const string ZipFileExtension = "zip";
         private readonly ICryptographyService _cryptographyService;
         private readonly IDataAccessLayer _database;
         private readonly IDropboxService _dropboxService;
@@ -42,6 +44,7 @@ namespace SecureFileShare.App.ViewModels
         private string _contactName;
         private ContactsView _contactsView;
         private ICommand _decryptCommand;
+        private bool _deleteTmpFile;
         private bool _disableForEncryption = true;
         private ICommand _encryptCommand;
         private ICommand _exitCommand;
@@ -280,16 +283,13 @@ namespace SecureFileShare.App.ViewModels
             IEnumerable<string> dragFileList = ((DataObject) dropInfo.Data).GetFileDropList().Cast<string>();
             IList<string> fileList = dragFileList as IList<string> ?? dragFileList.ToList();
 
-            if (fileList.Count() == 1)
+            dropInfo.Effects = fileList.Any(item =>
             {
-                dropInfo.Effects = fileList.Any(item =>
-                {
-                    string extension = Path.GetExtension(item);
-                    return extension != null;
-                })
-                    ? DragDropEffects.Copy
-                    : DragDropEffects.None;
-            }
+                string extension = Path.GetExtension(item);
+                return extension != null;
+            })
+                ? DragDropEffects.Copy
+                : DragDropEffects.None;
         }
 
         public void Drop(IDropInfo dropInfo)
@@ -297,27 +297,40 @@ namespace SecureFileShare.App.ViewModels
             IEnumerable<string> dragFileList = ((DataObject) dropInfo.Data).GetFileDropList().Cast<string>();
             IList<string> fileList = dragFileList as IList<string> ?? dragFileList.ToList();
 
-            if (fileList.Count() == 1)
+            dropInfo.Effects = fileList.Any(item =>
             {
-                dropInfo.Effects = fileList.Any(item =>
-                {
-                    string extension = Path.GetExtension(item);
-                    return extension != null;
-                })
-                    ? DragDropEffects.Copy
-                    : DragDropEffects.None;
+                string extension = Path.GetExtension(item);
+                return extension != null;
+            })
+                ? DragDropEffects.Copy
+                : DragDropEffects.None;
 
-                if (dropInfo.Effects == DragDropEffects.Copy)
+            if (dropInfo.Effects == DragDropEffects.Copy)
+            {
+                string fileName = fileList.FirstOrDefault();
+
+                if (fileList.Count() > 1)
                 {
-                    if (CheckFileSize(fileList.FirstOrDefault()))
+                    fileName = HandlMultipleFiles(fileList, fileName);
+                }
+
+                if (CheckFileSize(fileName))
+                {
+                    SourceFilepath = fileName;
+                }
+                else
+                {
+                    if (_deleteTmpFile)
                     {
-                        SourceFilepath = fileList.FirstOrDefault();
+                        if (fileName != null)
+                        {
+                            _logger.Info("delete tmp zip file!");
+                            File.Delete(fileName);
+                        }
                     }
-                    else
-                    {
-                        _logger.Warn("file size is greater than 100MB --> currently not supported");
-                        _messenger.Send(new FileSizeNotSupportedMsg());
-                    }
+
+                    _logger.Warn("file size is greater than 100MB --> currently not supported");
+                    _messenger.Send(new FileSizeNotSupportedMsg());
                 }
             }
         }
@@ -594,10 +607,17 @@ namespace SecureFileShare.App.ViewModels
 
         private void OnChooseSourceConfirmMsg(ChooseSourceConfirmMsg msg)
         {
-            if (CheckFileSize(msg.Filename))
+            string fileName = msg.Filenames.FirstOrDefault();
+
+            if (msg.Filenames.Count() > 1)
             {
-                _logger.Info("setting source paht to: " + msg.Filename);
-                SourceFilepath = msg.Filename;
+                fileName = HandlMultipleFiles(msg.Filenames, fileName);
+            }
+
+            if (CheckFileSize(fileName))
+            {
+                _logger.Info("setting source paht to: " + fileName);
+                SourceFilepath = fileName;
             }
             else
             {
@@ -792,6 +812,72 @@ namespace SecureFileShare.App.ViewModels
                 File.Delete(_sourceFilepath);
                 _logger.Info("file deleted!");
             }
+        }
+
+        private string ZipFiles(IEnumerable<string> fileList)
+        {
+            _logger.Info("create tmp zip file");
+            string tmpZipFile = Path.Combine(Path.GetTempPath(), Path.GetRandomFileName());
+
+            //Creates a new, blank zip file to work with - the file will be
+            //finalized when the using statement completes
+            using (ZipArchive zipFile = ZipFile.Open(tmpZipFile, ZipArchiveMode.Create))
+            {
+                foreach (string filename in fileList)
+                {
+                    _logger.Info("add file to zip archive: " + Path.GetFileName(filename));
+                    zipFile.CreateEntryFromFile(filename, Path.GetFileName(filename), CompressionLevel.Optimal);
+                }
+            }
+
+            return tmpZipFile;
+        }
+
+        private static void CursorDefault()
+        {
+            Application.Current.Dispatcher.Invoke(() => { Mouse.OverrideCursor = null; });
+        }
+
+        private static void CursorWait()
+        {
+            Application.Current.Dispatcher.Invoke(() => { Mouse.OverrideCursor = Cursors.Wait; });
+        }
+
+        private string HandlMultipleFiles(IList<string> fileList, string fileName)
+        {
+            if (fileName != null)
+            {
+                _logger.Info("check file list");
+
+                if (CheckFileList(fileList))
+                {
+                    _logger.Info("file list ok");
+                    _messenger.Send(new ZipFilesStartMsg());
+
+                    CursorWait();
+                    _logger.Info("start zipping files");
+                    fileName = ZipFiles(fileList);
+                    CursorDefault();
+
+                    string oldFilename = fileName;
+                    _logger.Info("change extension of tmp file to zip file");
+                    fileName = Path.ChangeExtension(fileName, ZipFileExtension);
+                    File.Move(oldFilename, fileName);
+
+                    _deleteTmpFile = true;
+                }
+                else
+                {
+                    _messenger.Send(new NoDirectorySupportedMsg());
+                }
+            }
+
+            return fileName;
+        }
+
+        private bool CheckFileList(IEnumerable<string> fileList)
+        {
+            return !fileList.Any(f => File.GetAttributes(f).HasFlag(FileAttributes.Directory));
         }
 
         #endregion Private Methods
